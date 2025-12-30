@@ -29,6 +29,7 @@
     "symfony/form": "8.0.*",
     "symfony/validator": "8.0.*",
     "symfony/translation": "8.0.*",
+    "symfony/clock": "8.0.*",
     "doctrine/orm": "3.6.*"
   },
   "require-dev": {
