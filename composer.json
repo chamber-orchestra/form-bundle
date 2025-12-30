@@ -1,0 +1,63 @@
+{
+  "name": "chamber-orchestra/form-bundle",
+  "type": "library",
+  "description": "The symfony form bundle for JSON API responses",
+  "keywords": [
+    "symfony",
+    "form-bundle",
+    "form",
+    "api",
+    "json",
+    "typescript"
+  ],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Andrew Lukin",
+      "email": "lukin.andrej@gmail.com",
+      "homepage": "https://github.com/wtorsi",
+      "role": "Developer"
+    }
+  ],
+  "require": {
+    "php": "^8.4",
+    "chamber-orchestra/view-bundle": "8.0.*",
+    "symfony/dependency-injection": "8.0.*",
+    "symfony/config": "8.0.*",
+    "symfony/framework-bundle": "8.0.*",
+    "symfony/runtime": "8.0.*",
+    "symfony/form": "8.0.*",
+    "symfony/validator": "8.0.*",
+    "symfony/translation": "8.0.*",
+    "doctrine/orm": "3.6.*"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^12.5",
+    "symfony/test-pack": "^1.2"
+  },
+  "autoload": {
+    "psr-4": {
+      "ChamberOrchestra\\FormBundle\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests/"
+    }
+  },
+  "minimum-stability": "stable",
+  "conflict": {
+    "symfony/symfony": "*"
+  },
+  "extra": {
+    "symfony": {
+      "allow-contrib": false,
+      "require": "8.0.*"
+    }
+  },
+  "config": {
+    "allow-plugins": {
+      "symfony/runtime": true
+    }
+  }
+}
