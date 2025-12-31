@@ -10,10 +10,15 @@ use ChamberOrchestra\FormBundle\View\ViolationView;
 use ChamberOrchestra\ViewBundle\View\DataView;
 use ChamberOrchestra\ViewBundle\View\ResponseView;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\Forms;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\ConstraintViolation;
 
 final class FormTraitTest extends TestCase
@@ -179,5 +184,169 @@ final class FormTraitTest extends TestCase
         self::assertSame('root.profile.email', $violations[0]->propertyPath);
         self::assertSame('urn:uuid:3f238b83-2c8a-4f58-b7a6-3d54a3bd93ed', $violations[0]->type);
         self::assertSame(['{{ value }}' => 'invalid'], $violations[0]->parameters);
+    }
+
+    public function testCreateRedirectResponseReturnsViewForXmlHttpRequest(): void
+    {
+        $request = new Request();
+        $request->headers->set('X-Requested-With', 'XMLHttpRequest');
+
+        $stack = new RequestStack();
+        $stack->push($request);
+
+        $container = $this->createStub(ContainerInterface::class);
+        $container->method('get')->with('request_stack')->willReturn($stack);
+
+        $host = new class($container) {
+            use FormTrait;
+
+            protected \Psr\Container\ContainerInterface $container;
+
+            public function __construct(ContainerInterface $container)
+            {
+                $this->container = $container;
+            }
+
+            protected function redirect(string $url, int $status = 302): RedirectResponse
+            {
+                return new RedirectResponse('', $status, ['Location' => $url]);
+            }
+
+            public function exposeCreateRedirectResponse(
+                string $url,
+                int $status
+            ): Response|\ChamberOrchestra\FormBundle\View\RedirectView {
+                return $this->createRedirectResponse($url, $status);
+            }
+        };
+
+        $response = $host->exposeCreateRedirectResponse('/target', Response::HTTP_FOUND);
+
+        self::assertInstanceOf(\ChamberOrchestra\FormBundle\View\RedirectView::class, $response);
+        self::assertSame('/target', $response->location);
+        self::assertSame(Response::HTTP_FOUND, $response->status);
+    }
+
+    public function testCreateRedirectResponseReturnsResponseForNonXmlHttpRequest(): void
+    {
+        $request = new Request();
+        $stack = new RequestStack();
+        $stack->push($request);
+
+        $container = $this->createStub(ContainerInterface::class);
+        $container->method('get')->with('request_stack')->willReturn($stack);
+
+        $host = new class($container) {
+            use FormTrait;
+
+            protected \Psr\Container\ContainerInterface $container;
+
+            public function __construct(ContainerInterface $container)
+            {
+                $this->container = $container;
+            }
+
+            protected function redirect(string $url, int $status = 302): RedirectResponse
+            {
+                return new RedirectResponse($url, $status, ['Location' => $url]);
+            }
+
+            public function exposeCreateRedirectResponse(string $url, int $status): Response
+            {
+                return $this->createRedirectResponse($url, $status);
+            }
+        };
+
+        $response = $host->exposeCreateRedirectResponse('/target', Response::HTTP_FOUND);
+
+        self::assertInstanceOf(Response::class, $response);
+        self::assertSame('/target', $response->headers->get('Location'));
+        self::assertSame(Response::HTTP_FOUND, $response->getStatusCode());
+    }
+
+    public function testCreateSuccessHtmlResponseHandlesXmlHttpRequest(): void
+    {
+        $request = new Request();
+        $request->headers->set('X-Requested-With', 'XMLHttpRequest');
+
+        $stack = new RequestStack();
+        $stack->push($request);
+
+        $container = $this->createStub(ContainerInterface::class);
+        $container->method('get')->with('request_stack')->willReturn($stack);
+
+        $host = new class($container) {
+            use FormTrait;
+
+            protected \Psr\Container\ContainerInterface $container;
+
+            public function __construct(ContainerInterface $container)
+            {
+                $this->container = $container;
+            }
+
+            public function renderView(string $view, array $parameters = []): string
+            {
+                return '<p>html</p>';
+            }
+
+            protected function render(string $view, array $parameters = [], ?Response $response = null): Response
+            {
+                return new Response('html');
+            }
+
+            public function exposeCreateSuccessHtmlResponse(
+                string $view,
+                array $parameters = []
+            ): Response|\ChamberOrchestra\FormBundle\View\SuccessHtmlView {
+                return $this->createSuccessHtmlResponse($view, $parameters);
+            }
+        };
+
+        $response = $host->exposeCreateSuccessHtmlResponse('template.html.twig');
+
+        self::assertInstanceOf(\ChamberOrchestra\FormBundle\View\SuccessHtmlView::class, $response);
+        self::assertSame(['html' => '<p>html</p>'], $response->data);
+    }
+
+    public function testCreateSuccessHtmlResponseHandlesNonXmlHttpRequest(): void
+    {
+        $request = new Request();
+        $stack = new RequestStack();
+        $stack->push($request);
+
+        $container = $this->createStub(ContainerInterface::class);
+        $container->method('get')->with('request_stack')->willReturn($stack);
+
+        $host = new class($container) {
+            use FormTrait;
+
+            protected \Psr\Container\ContainerInterface $container;
+
+            public function __construct(ContainerInterface $container)
+            {
+                $this->container = $container;
+            }
+
+            public function renderView(string $view, array $parameters = []): string
+            {
+                return '<p>html</p>';
+            }
+
+            protected function render(string $view, array $parameters = [], ?Response $response = null): Response
+            {
+                return new Response('html');
+            }
+
+            public function exposeCreateSuccessHtmlResponse(string $view, array $parameters = []): Response
+            {
+                return $this->createSuccessHtmlResponse($view, $parameters);
+            }
+        };
+
+        $response = $host->exposeCreateSuccessHtmlResponse('template.html.twig');
+
+        self::assertInstanceOf(Response::class, $response);
+        self::assertSame('html', $response->getContent());
     }
 }

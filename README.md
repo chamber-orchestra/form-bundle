@@ -1,3 +1,5 @@
+[![PHP Composer](https://github.com/chamber-orchestra/form-bundle/actions/workflows/php.yml/badge.svg)](https://github.com/chamber-orchestra/form-bundle/actions/workflows/php.yml)
+
 # ChamberOrchestra Form Bundle
 
 Symfony bundle that streamlines JSON‑first form handling for APIs. It provides helper traits for controller flow, specialized form types, reusable transformers, and standardized error views (RFC 7807 style) to keep API responses consistent.

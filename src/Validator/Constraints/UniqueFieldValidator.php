@@ -132,7 +132,7 @@ class UniqueFieldValidator extends ConstraintValidator
 
     private function buildCriteria(UniqueField $constraint, $value, $origin): Criteria
     {
-        $criteria = Criteria::create();
+        $criteria = Criteria::create(true);
 
         // build includes fields with OR join
         foreach ($constraint->fields as $field) {
