@@ -16,9 +16,9 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class ValidationFailedView extends FailureView
 {
-    public string $type = 'https://symfony.com/errors/validation';
-    public string $detail;
-    public array $violations;
+    protected string $type = 'https://symfony.com/errors/validation';
+    protected string $detail;
+    protected array $violations;
 
     public function __construct(array $violations = [], string $message = 'Validation Failed')
     {

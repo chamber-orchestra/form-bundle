@@ -14,15 +14,10 @@ namespace ChamberOrchestra\FormBundle\View;
 use ChamberOrchestra\ViewBundle\View\ViewInterface;
 use Symfony\Component\HttpFoundation\Response;
 
-class RedirectView implements ViewInterface
+readonly class RedirectView implements ViewInterface
 {
     public int $status;
     public string $location;
-
-    public function getStatus(): int
-    {
-        return $this->status;
-    }
 
     public function __construct(string $location, int $status = Response::HTTP_MOVED_PERMANENTLY)
     {

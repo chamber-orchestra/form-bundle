@@ -1,76 +1,81 @@
-# ChamberOrchestra View Bundle
+# ChamberOrchestra Form Bundle
 
-A lightweight Symfony bundle for building typed, reusable JSON responses. Views encapsulate serialization concerns so controllers can return simple objects instead of `Response`.
+Symfony bundle that streamlines JSON‑first form handling for APIs. It provides helper traits for controller flow, specialized form types, reusable transformers, and standardized error views (RFC 7807 style) to keep API responses consistent.
+
+## Features
+- Controller helpers via `FormTrait` and `ApiFormTrait` for submit/validate/response flow.
+- JSON and file payload handling for mutation requests.
+- API form base types (`GetForm`, `PostForm`, `QueryForm`, `MutationForm`) with empty block prefixes.
+- Custom form types: `BooleanType`, `TimestampType`, `HiddenEntityType`.
+- Data transformers for booleans, timestamps, arrays, and JSON strings.
+- Problem/validation views and violation mapping for structured error output.
+- `UniqueField` validation constraint for Doctrine repositories.
+- `TelType` extension to normalize phone input.
 
 ## Requirements
 - PHP 8.4
-- Symfony 8.0 components (http-kernel, serializer, property-access, dependency-injection, config)
-- doctrine/common ^3.5
+- Symfony 8.0 components (framework-bundle, form, validator, serializer, config, dependency-injection, runtime)
+- doctrine/orm 3.6.*
+- chamber-orchestra/view-bundle 8.0.*
 
 ## Installation
 ```bash
-composer require chamber-orchestra/view-bundle:8.0.*
+composer require chamber-orchestra/form-bundle:8.0.*
 ```
 
 Enable the bundle in `config/bundles.php`:
 ```php
 return [
     // ...
-    ChamberOrchestra\ViewBundle\ChamberOrchestraViewBundle::class => ['all' => true],
+    ChamberOrchestra\FormBundle\ChamberOrchestraFormBundle::class => ['all' => true],
 ];
 ```
 
-## Quickstart
-Create a view that maps fields from a domain object:
+## Usage Overview
+- Controller flow helpers live in `src/FormTrait.php` and `src/ApiFormTrait.php`.
+- Service wiring lives in `src/Resources/config/services.php`.
+- Form types are under `src/Type/`, transformers under `src/Transformer/`.
+
+## ApiFormTrait Example
 ```php
-use ChamberOrchestra\ViewBundle\View\BindView;
-use ChamberOrchestra\ViewBundle\Attribute\Type;
-use ChamberOrchestra\ViewBundle\View\IterableView;
+use ChamberOrchestra\FormBundle\ApiFormTrait;
+use ChamberOrchestra\ViewBundle\View\ViewInterface;
+use Symfony\Component\HttpFoundation\Request;
 
-final class UserView extends BindView
+final class SearchCourseAction
 {
-    public string $id;
-    public string $name;
+    use ApiFormTrait;
 
-    #[Type(ImageView::class)]
-    public IterableView $images;
-
-    public function __construct(User $user)
+    public function __invoke(Request $request): ViewInterface
     {
-        parent::__construct($user);
-    }
-}
+        $form = $this->createForm(SearchCourseForm::class);
+        $form->submit($request->query->all());
 
-final class ImageView extends BindView
-{
-    public string $path;
-}
-```
+        return $this->onFormSubmitted($form, function (SearchCourseData $dto) use ($request) {
+            $entities = $this->er->searchCourses(
+                $pagination = $this->getPagination(['per_page_limit' => $this->getPerPageLimit($request)]),
+                $dto->query,
+                $dto->brands,
+                $dto->topics,
+                $dto->products,
+                $dto->durations
+            );
 
-Return a view from a controller:
-```php
-#[Route('/user/me', methods: ['GET'])]
-final class GetMeAction
-{
-    public function __invoke(): UserView
-    {
-        return new UserView($this->getUser());
+            return new PaginatedView($entities, $pagination, CourseView::class);
+        });
     }
 }
 ```
-`ViewSubscriber` converts any `ViewInterface` result into a `JsonResponse`. Non-view results are ignored.
 
-## Core Views
-- `ResponseView`: base response with status (200) and headers (`Content-Type: application/json`), overridable in subclasses.
-- `DataView`: wraps payload under `data`.
-- `BindView`: maps matching properties from a source object to the view; honors `Attribute\Type` on `IterableView` properties for typed collections.
-- `IterableView`: maps collections via a callback or view class string.
-- `KeyValueView`: returns an associative array for metadata blocks.
+## Tests
+Install dependencies:
+```bash
+composer install
+```
 
-## Caching & Build ID
-`SetVersionSubscriber` seeds `BindUtils::configure()` with `container.build_id`. When `APP_DEBUG=false`, property accessor caching is enabled with a 24h lifetime and namespace `view_bind`.
+Run the full suite:
+```bash
+./vendor/bin/phpunit
+```
 
-## Development & Tests
-- Install deps: `composer install`
-- Run unit/integration tests: `./bin/phpunit`
-- Namespaces live under `ChamberOrchestra\ViewBundle`; autoloaded PSR-4 from `src/`.
+The test kernel for integration tests is `tests/Integrational/TestKernel.php`.

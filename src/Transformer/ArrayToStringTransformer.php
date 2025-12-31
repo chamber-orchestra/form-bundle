@@ -14,7 +14,7 @@ namespace ChamberOrchestra\FormBundle\Transformer;
 use ChamberOrchestra\FormBundle\Exception\TransformationFailedException;
 use Symfony\Component\Form\DataTransformerInterface;
 
-class ArrayToStringTransformer implements DataTransformerInterface
+readonly class ArrayToStringTransformer implements DataTransformerInterface
 {
     public function transform($value): string
     {

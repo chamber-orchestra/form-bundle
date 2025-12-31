@@ -14,7 +14,7 @@ namespace ChamberOrchestra\FormBundle\Transformer;
 use ChamberOrchestra\FormBundle\Exception\TransformationFailedException;
 use Symfony\Component\Form\DataTransformerInterface;
 
-class JsonStringToArrayTransformer implements DataTransformerInterface
+readonly class JsonStringToArrayTransformer implements DataTransformerInterface
 {
     public function transform($value): string|null
     {

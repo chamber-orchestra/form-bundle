@@ -17,24 +17,13 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class FailureView extends ResponseView
 {
-    public string $type = 'https://tools.ietf.org/html/rfc2616#section-10';
-    public int $status;
-    public string $title;
+    protected string $type = 'https://tools.ietf.org/html/rfc2616#section-10';
+    protected readonly string $title;
 
     public function __construct(int $status = JsonResponse::HTTP_BAD_REQUEST, string $message = 'Validation Failed')
     {
-        $this->status = $status;
         $this->title = $message;
-    }
-
-    public function getStatus(): int
-    {
-        return $this->status;
-    }
-
-    public function getHeaders(): array
-    {
-        return ['Content-Type' => 'application/problem+json'];
+        parent::__construct($status, ['Content-Type' => 'application/problem+json']);
     }
 
     public function normalize(
