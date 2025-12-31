@@ -21,6 +21,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 final class TestKernel extends Kernel
 {
@@ -56,6 +57,9 @@ final class TestKernel extends Kernel
             ->public();
         $container->services()
             ->alias(EntityManagerInterface::class, 'doctrine.orm.entity_manager')
+            ->public();
+        $container->services()
+            ->alias(ValidatorInterface::class, 'validator')
             ->public();
 
         if (\class_exists(DoctrineBundle::class)) {
