@@ -32,10 +32,9 @@ class HiddenEntityType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $em = $this->em;
-        $that = $this;
         $builder->addViewTransformer(
             new CallbackTransformer(
-                function (object|null $value) use ($options, $em) {
+                function (object|null $value) use ($options, $em): string|null {
                     if (null === $value) {
                         return null;
                     }
@@ -43,23 +42,23 @@ class HiddenEntityType extends AbstractType
                     $class = $em->getClassMetadata($options['class']);
                     $id = $class->getFieldValue($value, $options['choice_value']);
 
-                    if (!\is_scalar($id) && !\is_object($id) && !\method_exists($id, '__toString')) {
+                    if (!\is_scalar($id) && (!\is_object($id) || !\method_exists($id, '__toString'))) {
                         throw TransformationFailedException::notAllowedType($value, ['scalar', 'string']);
                     }
 
                     return (string)$id;
                 },
-                function ($id) use ($options, $em, $that) {
+                function (mixed $id) use ($options, $em): object|null {
                     if (!\is_scalar($id)) {
                         throw TransformationFailedException::notAllowedType($id, ['scalar']);
                     }
 
-                    if (null === $id || false == $id) {
+                    if ($id === null || $id === false || $id === '') {
                         return null;
                     }
 
                     if (null !== $options['query_builder']) {
-                        $qb = $that->prepareQueryBuilder($options['query_builder'], $options['choice_value'], $id);
+                        $qb = $this->prepareQueryBuilder($options['query_builder'], $options['choice_value'], $id);
                         $entity = $qb->getQuery()->getOneOrNullResult();
                     } else {
                         $er = $em->getRepository($options['class']);
@@ -93,7 +92,16 @@ class HiddenEntityType extends AbstractType
             ->setRequired('class')
             ->setAllowedTypes('class', 'string')
             ->setAllowedValues('class', function ($value) use ($em): bool {
-                return \class_exists($value) && $this->em->getClassMetadata($value);
+                if (!\class_exists($value)) {
+                    return false;
+                }
+
+                try {
+                    $em->getClassMetadata($value);
+                    return true;
+                } catch (\Throwable) {
+                    return false;
+                }
             });
 
         $resolver
@@ -112,7 +120,7 @@ class HiddenEntityType extends AbstractType
                         \sprintf(
                             'Parameter "query_builder" must return instance of "%s", "%s" returned.',
                             QueryBuilder::class,
-                            \get_class($qb)
+                            \get_debug_type($qb)
                         )
                     );
                 }
@@ -144,13 +152,24 @@ class HiddenEntityType extends AbstractType
         return HiddenType::class;
     }
 
-    private function prepareQueryBuilder(QueryBuilder $qb, string $idFieldName, $id): QueryBuilder
+    private function prepareQueryBuilder(QueryBuilder $qb, string $idFieldName, mixed $id): QueryBuilder
     {
-        $alias = $qb->getRootAliases()[0];
-        $param = 'param'.\uniqid();
+        if (!\preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $idFieldName)) {
+            throw new InvalidArgumentException(
+                \sprintf('Invalid field name "%s".', $idFieldName)
+            );
+        }
+
+        $aliases = $qb->getRootAliases();
+        if (empty($aliases)) {
+            throw new InvalidArgumentException('QueryBuilder must have at least one root alias.');
+        }
+
+        $alias = $aliases[0];
+        $param = 'param_'.\bin2hex(\random_bytes(8));
 
         $qb
-            ->andWhere($qb->expr()->eq($alias.'.'.$idFieldName, ':'.$param))
+            ->andWhere($qb->expr()->eq(\sprintf('%s.%s', $alias, $idFieldName), ':'.$param))
             ->setParameter($param, $id);
 
         return $qb;

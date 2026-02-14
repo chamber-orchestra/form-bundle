@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace ChamberOrchestra\FormBundle\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
-use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 class UniqueField extends Constraint
 {
@@ -25,9 +24,9 @@ class UniqueField extends Constraint
      */
     public array $fields = [];
     /**
-     * @var array|callable AND condition
+     * @var array<string, mixed>|\Closure AND condition
      */
-    public $exclude = [];
+    public array|\Closure $exclude = [];
     public string|null $errorPath = null;
     public ?\Closure $normalizer = null;
     public bool $allowEmptyString = false;
@@ -38,10 +37,6 @@ class UniqueField extends Constraint
     public function __construct(?array $options = null)
     {
         parent::__construct($options);
-
-        if (!\is_array($this->exclude) && !\is_callable($this->exclude)) {
-            throw new UnexpectedTypeException($this->exclude, 'string[]|callable');
-        }
     }
 
     public function getTargets(): array

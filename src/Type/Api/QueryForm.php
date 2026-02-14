@@ -12,9 +12,17 @@ declare(strict_types=1);
 namespace ChamberOrchestra\FormBundle\Type\Api;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 abstract class QueryForm extends AbstractType
 {
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults([
+            'csrf_protection' => false,
+        ]);
+    }
+
     public function getBlockPrefix(): string
     {
         return '';

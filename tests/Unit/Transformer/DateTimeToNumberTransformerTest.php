@@ -36,9 +36,51 @@ final class DateTimeToNumberTransformerTest extends TestCase
         self::assertSame($date->getTimestamp(), $restored->getTimestamp());
     }
 
+    public function testReverseTransformHandlesTimestampZero(): void
+    {
+        $transformer = new DateTimeToNumberTransformer(\DateTimeImmutable::class);
+
+        $result = $transformer->reverseTransform(0);
+
+        self::assertInstanceOf(\DateTimeImmutable::class, $result);
+        self::assertSame(0, $result->getTimestamp());
+    }
+
+    public function testTransformReturnsNullForNull(): void
+    {
+        $transformer = new DateTimeToNumberTransformer(\DateTimeImmutable::class);
+
+        self::assertNull($transformer->transform(null));
+    }
+
+    public function testReverseTransformReturnsNullForNull(): void
+    {
+        $transformer = new DateTimeToNumberTransformer(\DateTimeImmutable::class);
+
+        self::assertNull($transformer->reverseTransform(null));
+    }
+
+    public function testTransformRejectsInvalidType(): void
+    {
+        $transformer = new DateTimeToNumberTransformer(\DateTimeImmutable::class);
+
+        $this->expectException(\TypeError::class);
+
+        $transformer->transform('not-a-date');
+    }
+
+    public function testReverseTransformRejectsInvalidType(): void
+    {
+        $transformer = new DateTimeToNumberTransformer(\DateTimeImmutable::class);
+
+        $this->expectException(\TypeError::class);
+
+        $transformer->reverseTransform('not-an-int');
+    }
+
     public function testConstructorRejectsInvalidClass(): void
     {
-        $this->expectException(\TypeError::class);
+        $this->expectException(\InvalidArgumentException::class);
 
         new DateTimeToNumberTransformer(\stdClass::class);
     }
