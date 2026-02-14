@@ -16,7 +16,14 @@ return static function (ContainerConfigurator $container): void {
 
     $services
         ->load('ChamberOrchestra\\FormBundle\\', __DIR__.'/../../')
-        ->exclude(__DIR__.'/../../{DependencyInjection,Resources,Exception,Transformer,View}');
+        ->exclude([
+            __DIR__.'/../../DependencyInjection/',
+            __DIR__.'/../../Resources/',
+            __DIR__.'/../../Exception/',
+            __DIR__.'/../../Transformer/',
+            __DIR__.'/../../Utils/',
+            __DIR__.'/../../View/',
+        ]);
 
     $services
         ->set(ProblemNormalizer::class)

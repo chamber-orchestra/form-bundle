@@ -35,7 +35,7 @@ class TelExtension extends AbstractTypeExtension
                         return null;
                     }
 
-                    return \preg_replace('/[^\d]/', '', $value);
+                    return \preg_replace('/[^\d]/', '', $value) ?? '';
                 }
             )
         );

@@ -40,9 +40,16 @@ class UniqueFieldValidator extends ConstraintValidator
             return;
         }
 
+        if (empty($constraint->fields)) {
+            throw new ConstraintDefinitionException('UniqueField constraint requires at least one field.');
+        }
+
         $normalized = $value;
         if (null !== $constraint->normalizer) {
-            $normalized = \call_user_func($constraint->normalizer, $value);
+            $normalized = ($constraint->normalizer)($value);
+            if (null === $normalized) {
+                return;
+            }
         }
 
         $criteria = $this->buildCriteria($constraint, $normalized, $value);
@@ -102,7 +109,7 @@ class UniqueFieldValidator extends ConstraintValidator
         $em = $this->doctrine->getManagerForClass($constraint->entityClass);
         if (null === $em) {
             throw new ConstraintDefinitionException(
-                sprintf('Class "%s" is not managed by doctrine', $constraint->entityClass)
+                \sprintf('Class "%s" is not managed by Doctrine.', $constraint->entityClass)
             );
         }
 
@@ -136,6 +143,7 @@ class UniqueFieldValidator extends ConstraintValidator
 
         // build includes fields with OR join
         foreach ($constraint->fields as $field) {
+            $this->assertValidFieldName($field);
             $this->addComparisonToCriteria(
                 $criteria,
                 $this->buildComparison($field, $value),
@@ -144,24 +152,32 @@ class UniqueFieldValidator extends ConstraintValidator
         }
 
         // build exclude fields with AND join
-        $exclude = \is_callable($constraint->exclude)
-            ? \call_user_func($constraint->exclude, $origin, $value)
+        $exclude = $constraint->exclude instanceof \Closure
+            ? ($constraint->exclude)($origin, $value)
             : $constraint->exclude;
 
         if (!\is_array($exclude)) {
-            throw new ConstraintDefinitionException('Constraint `exclude` as callable must return array.');
+            throw new ConstraintDefinitionException('Constraint `exclude` as Closure must return array.');
         }
 
-        if (\count($exclude)) {
-            foreach ($exclude as $field => $param) {
-                $this->addComparisonToCriteria(
-                    $criteria,
-                    $this->buildComparison($field, $param, true),
-                    CompositeExpression::TYPE_AND
-                );
-            }
+        foreach ($exclude as $field => $param) {
+            $this->assertValidFieldName($field);
+            $this->addComparisonToCriteria(
+                $criteria,
+                $this->buildComparison($field, $param, true),
+                CompositeExpression::TYPE_AND
+            );
         }
 
         return $criteria;
+    }
+
+    private function assertValidFieldName(mixed $field): void
+    {
+        if (!\is_string($field) || !\preg_match('/^[a-zA-Z_][a-zA-Z0-9_.]*$/', $field)) {
+            throw new ConstraintDefinitionException(
+                \sprintf('Invalid field name "%s" in constraint criteria.', $field)
+            );
+        }
     }
 }

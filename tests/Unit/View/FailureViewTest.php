@@ -32,6 +32,6 @@ final class FailureViewTest extends TestCase
         $data = $view->normalize($normalizer);
 
         self::assertSame('Bad', $data['title']);
-        self::assertSame('https://tools.ietf.org/html/rfc2616#section-10', $data['type']);
+        self::assertSame('https://datatracker.ietf.org/doc/html/rfc9110#section-15', $data['type']);
     }
 }

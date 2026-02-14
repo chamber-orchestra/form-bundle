@@ -33,7 +33,7 @@ readonly class JsonStringToArrayTransformer implements DataTransformerInterface
 
     public function reverseTransform($value): array|null
     {
-        if (null === $value) {
+        if (null === $value || '' === $value) {
             return null;
         }
 

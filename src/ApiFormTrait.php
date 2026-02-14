@@ -15,25 +15,35 @@ use ChamberOrchestra\FormBundle\Type\Api\MutationForm;
 use ChamberOrchestra\ViewBundle\View\ViewInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 trait ApiFormTrait
 {
     use FormTrait;
 
-    protected function handleApiCall(FormInterface|string $form, callable|null $callable = null): ViewInterface
+    protected function handleApiCall(FormInterface|string $form, callable|null $callable = null): Response|ViewInterface
     {
-        $request = $this->container->get('request_stack')->getCurrentRequest();
+        $request = $this->getCurrentRequest();
+        if ($request === null) {
+            throw new \LogicException('Cannot handle API call without an active request.');
+        }
+
         if (!$form instanceof FormInterface && \is_string($form)) {
             $form = $this->container->get('form.factory')->create($form);
         }
 
-        return $this->onFormSubmitted(
-            $form->getConfig()->getType()->getInnerType() instanceof MutationForm
-                ? $form->submit($this->convertRequestToArray($request))
-                : $form->handleRequest($request),
-            $callable
-        );
+        if ($form->getConfig()->getType()->getInnerType() instanceof MutationForm) {
+            $form->submit($this->convertRequestToArray($request));
+        } else {
+            $form->handleRequest($request);
+        }
+
+        if (!$form->isSubmitted()) {
+            throw $this->createSubmittedFormRequiredException($form::class);
+        }
+
+        return $this->onFormSubmitted($form, $callable);
     }
 
     private function convertRequestToArray(Request $request): array

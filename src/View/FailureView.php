@@ -17,7 +17,7 @@ use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class FailureView extends ResponseView
 {
-    protected string $type = 'https://tools.ietf.org/html/rfc2616#section-10';
+    protected string $type = 'https://datatracker.ietf.org/doc/html/rfc9110#section-15';
     protected readonly string $title;
 
     public function __construct(int $status = JsonResponse::HTTP_BAD_REQUEST, string $message = 'Validation Failed')
