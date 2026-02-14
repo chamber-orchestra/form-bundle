@@ -1,6 +1,6 @@
 <?php
 
-namespace ChamberOrchestra\FormBundle\Utils;
+declare(strict_types=1);
 
 /*
  * This file is part of the ChamberOrchestra package.
@@ -9,10 +9,12 @@ namespace ChamberOrchestra\FormBundle\Utils;
  * file that was distributed with this source code.
  */
 
+namespace ChamberOrchestra\FormBundle\Utils;
+
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
-class CollectionUtils
+final class CollectionUtils
 {
     public static function sync(Collection $source, iterable $target): void
     {

@@ -98,6 +98,57 @@ final class UniqueFieldValidatorTest extends ConstraintValidatorTestCase
         $this->validator->validate('value', $constraint);
     }
 
+    public function testEmptyFieldsThrows(): void
+    {
+        $constraint = new UniqueField();
+        $constraint->entityClass = DummyEntity::class;
+        $constraint->fields = [];
+
+        $this->expectException(ConstraintDefinitionException::class);
+        $this->expectExceptionMessage('requires at least one field');
+
+        $this->validator->validate('value', $constraint);
+    }
+
+    public function testNormalizerReturningNullSkipsValidation(): void
+    {
+        $this->repository = new SelectableRepository(1);
+
+        $constraint = new UniqueField();
+        $constraint->entityClass = DummyEntity::class;
+        $constraint->fields = ['email'];
+        $constraint->normalizer = static fn() => null;
+
+        $this->validator->validate('value', $constraint);
+
+        $this->assertNoViolation();
+    }
+
+    public function testInvalidFieldNameThrows(): void
+    {
+        $constraint = new UniqueField();
+        $constraint->entityClass = DummyEntity::class;
+        $constraint->fields = ['email; DROP TABLE users'];
+
+        $this->expectException(ConstraintDefinitionException::class);
+        $this->expectExceptionMessage('Invalid field name');
+
+        $this->validator->validate('value', $constraint);
+    }
+
+    public function testInvalidExcludeFieldNameThrows(): void
+    {
+        $constraint = new UniqueField();
+        $constraint->entityClass = DummyEntity::class;
+        $constraint->fields = ['email'];
+        $constraint->exclude = ['id; DROP TABLE' => 1];
+
+        $this->expectException(ConstraintDefinitionException::class);
+        $this->expectExceptionMessage('Invalid field name');
+
+        $this->validator->validate('value', $constraint);
+    }
+
     public function testRepositoryMustBeSelectable(): void
     {
         $this->repository = new NonSelectableRepository();

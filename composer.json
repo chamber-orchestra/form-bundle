@@ -1,14 +1,18 @@
 {
   "name": "chamber-orchestra/form-bundle",
   "type": "library",
-  "description": "The symfony form bundle for JSON API responses",
+  "description": "Symfony 8 bundle for JSON-first API form handling with RFC 9110 error responses, data transformers, and Doctrine validation",
   "keywords": [
     "symfony",
-    "form-bundle",
+    "symfony8",
     "form",
     "api",
     "json",
-    "typescript"
+    "rest",
+    "rfc9110",
+    "validation",
+    "doctrine",
+    "data-transformer"
   ],
   "license": "MIT",
   "authors": [
@@ -20,7 +24,7 @@
     }
   ],
   "require": {
-    "php": "^8.4",
+    "php": "^8.5",
     "chamber-orchestra/view-bundle": "8.0.*",
     "symfony/dependency-injection": "8.0.*",
     "symfony/config": "8.0.*",
@@ -33,7 +37,7 @@
     "doctrine/orm": "3.6.*"
   },
   "require-dev": {
-    "phpunit/phpunit": "^12.5",
+    "phpunit/phpunit": "^13.0",
     "symfony/test-pack": "^1.2",
     "doctrine/doctrine-bundle": "^3.2"
   },

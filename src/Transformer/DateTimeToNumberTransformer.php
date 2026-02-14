@@ -17,8 +17,10 @@ readonly class DateTimeToNumberTransformer implements DataTransformerInterface
 {
     public function __construct(private string $class)
     {
-        if (!\in_array(\DateTimeInterface::class, \class_implements($class))) {
-            throw new \TypeError(\sprintf('Passed value must implement %s.', \DateTimeInterface::class));
+        if (!\in_array(\DateTimeInterface::class, \class_implements($class) ?: [])) {
+            throw new \InvalidArgumentException(
+                \sprintf('Class "%s" must implement %s.', $class, \DateTimeInterface::class)
+            );
         }
     }
 
@@ -39,6 +41,6 @@ readonly class DateTimeToNumberTransformer implements DataTransformerInterface
             );
         }
 
-        return $value ? (new $this->class)->setTimestamp($value) : null;
+        return $value !== null ? (new $this->class)->setTimestamp($value) : null;
     }
 }

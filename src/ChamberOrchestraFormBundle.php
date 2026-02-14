@@ -13,6 +13,6 @@ namespace ChamberOrchestra\FormBundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-class ChamberOrchestraFormBundle extends Bundle
+final class ChamberOrchestraFormBundle extends Bundle
 {
 }
