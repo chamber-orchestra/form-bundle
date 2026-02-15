@@ -1,20 +1,23 @@
 [![PHP Composer](https://github.com/chamber-orchestra/form-bundle/actions/workflows/php.yml/badge.svg)](https://github.com/chamber-orchestra/form-bundle/actions/workflows/php.yml)
+[![Latest Stable Version](https://poser.pugx.org/chamber-orchestra/form-bundle/v)](https://packagist.org/packages/chamber-orchestra/form-bundle)
+[![License](https://poser.pugx.org/chamber-orchestra/form-bundle/license)](https://packagist.org/packages/chamber-orchestra/form-bundle)
 
 # ChamberOrchestra Form Bundle
 
-A Symfony 8 bundle for JSON-first API form handling. Provides controller traits for submit/validate/response flow, specialized API form types, reusable data transformers, Doctrine-backed validation, and structured error responses following [RFC 9110](https://datatracker.ietf.org/doc/html/rfc9110#section-15).
+A Symfony 8 bundle that simplifies JSON-first form handling for REST APIs. It provides controller traits for the submit/validate/response flow, specialized API form types with CSRF disabled, reusable data transformers, Doctrine-backed uniqueness validation, and structured error responses following [RFC 9457 (Problem Details for HTTP APIs)](https://www.rfc-editor.org/rfc/rfc9457).
 
 ## Features
 
-- **Controller helpers** via `FormTrait` and `ApiFormTrait` for submit/validate/response flow with null-safe request handling.
-- **JSON and file payload handling** for mutation requests with automatic merging of uploaded files.
-- **API form base types** (`QueryForm`, `MutationForm`) with CSRF disabled and empty block prefixes for clean JSON payloads.
-- **Custom form types**: `BooleanType`, `TimestampType`, `HiddenEntityType` with secure query builder parameterization.
-- **Data transformers** for booleans, Unix timestamps, comma-separated arrays, and JSON strings.
-- **RFC 9110 error views** with structured violations for consistent API error responses.
-- **`UniqueField` validation constraint** for Doctrine repositories with field name validation and closure-based exclusions.
-- **`TelExtension`** to normalize phone number input.
-- **`CollectionUtils`** for syncing Doctrine collections.
+- **Controller traits** (`FormTrait`, `ApiFormTrait`) for submit/validate/response flow with null-safe request handling
+- **JSON payload handling** for mutation requests with automatic merging of uploaded files
+- **API form base types** (`QueryForm`, `MutationForm`) with CSRF disabled and empty block prefixes for clean JSON payloads
+- **Custom form types**: `BooleanType`, `TimestampType`, `HiddenEntityType` with secure query builder parameterization
+- **Data transformers** for booleans, Unix timestamps, comma-separated arrays, and JSON strings
+- **RFC 9457 problem details** via `ValidationFailedView` with structured violations for consistent API error responses
+- **Translatable error normalizer** (`ProblemNormalizer`) for localized exception messages in problem detail responses
+- **`UniqueField` validation constraint** for Doctrine repositories with multi-field checks, closure-based exclusions, and custom normalizers
+- **`TelExtension`** to strip non-digit characters from phone number input
+- **`CollectionUtils`** for syncing Doctrine collections (add new / remove stale items)
 
 ## Requirements
 
@@ -42,28 +45,11 @@ return [
 
 ### Controller Traits
 
-Controller flow helpers live in `FormTrait` and `ApiFormTrait`. Use `handleFormCall()` for standard form submissions and `handleApiCall()` for JSON API endpoints.
+Use `FormTrait` for standard HTML form submissions and `ApiFormTrait` for JSON API endpoints.
 
-### API Form Types
+`handleFormCall()` accepts a form class or instance, handles the request, and returns a view or response. `handleApiCall()` does the same for API endpoints -- it automatically parses JSON payloads for `MutationForm` types and merges uploaded files.
 
-Extend `QueryForm` for GET requests or `MutationForm` for POST/PUT/PATCH requests. Both disable CSRF protection and use empty block prefixes for clean JSON input/output.
-
-### Data Transformers
-
-- `TextToBoolTransformer` -- converts `"true"`, `"1"`, `"yes"` to boolean
-- `DateTimeToNumberTransformer` -- converts Unix timestamps to `DateTimeInterface` objects
-- `ArrayToStringTransformer` -- converts arrays to/from comma-separated strings
-- `JsonStringToArrayTransformer` -- parses JSON strings to arrays (handles empty strings)
-
-### HiddenEntityType
-
-Loads Doctrine entities by ID from a hidden form field. Supports custom `query_builder` with secure parameterized queries.
-
-### UniqueField Validator
-
-Validates field uniqueness against Doctrine repositories. Supports multiple fields, closure-based exclusions, custom normalizers, and targeted error paths.
-
-## Example
+`onFormSubmitted()` checks validity, returns a `ValidationFailedView` on failure, or invokes the callback on success:
 
 ```php
 use ChamberOrchestra\FormBundle\ApiFormTrait;
@@ -94,6 +80,41 @@ final class SearchCourseAction
     }
 }
 ```
+
+### API Form Types
+
+Extend `QueryForm` for GET requests or `MutationForm` for POST/PUT/PATCH requests. Both disable CSRF protection and use empty block prefixes for clean JSON input/output.
+
+### Data Transformers
+
+| Transformer | Description |
+|---|---|
+| `TextToBoolTransformer` | Converts `"true"`, `"1"`, `"yes"` to boolean |
+| `DateTimeToNumberTransformer` | Converts Unix timestamps to `DateTimeInterface` objects |
+| `ArrayToStringTransformer` | Converts arrays to/from comma-separated strings |
+| `JsonStringToArrayTransformer` | Parses JSON strings to arrays (handles empty strings) |
+
+### HiddenEntityType
+
+Loads Doctrine entities by ID from a hidden form field. Supports a custom `query_builder` option with secure parameterized queries.
+
+### UniqueField Validator
+
+Validates field uniqueness against Doctrine repositories. Supports multiple fields, closure-based exclusions, custom normalizers, and targeted error paths.
+
+### ProblemNormalizer
+
+Extends Symfony's `ProblemNormalizer` to translate exception messages when the exception implements `TranslatableExceptionInterface`. This ensures localized error messages in RFC 9457 problem detail responses.
+
+## Response Views
+
+| View | HTTP Status | Description |
+|---|---|---|
+| `SuccessView` | 200 | Empty success response |
+| `ValidationFailedView` | 422 | Form validation errors with structured `ViolationView` items |
+| `FailureView` | Configurable | Generic error response |
+| `RedirectView` | 301/302 | Redirect response for AJAX requests |
+| `SuccessHtmlView` | 200 | HTML fragment response for AJAX requests |
 
 ## Testing
 
