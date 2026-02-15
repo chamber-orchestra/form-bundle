@@ -43,9 +43,8 @@ trait FormTrait
         string $url,
         int $status = Response::HTTP_MOVED_PERMANENTLY
     ): Response|RedirectView {
-        /** @var Request $request */
-        $request = $this->container->get('request_stack')->getCurrentRequest();
-        if ($request->isXmlHttpRequest()) {
+        $request = $this->getCurrentRequest();
+        if ($request !== null && $request->isXmlHttpRequest()) {
             return new RedirectView($url, $status);
         }
 
@@ -67,8 +66,8 @@ trait FormTrait
 
     protected function createSuccessHtmlResponse(string $view, array $parameters = []): Response|SuccessHtmlView
     {
-        $request = $this->container->get('request_stack')->getCurrentRequest();
-        if ($request->isXmlHttpRequest()) {
+        $request = $this->getCurrentRequest();
+        if ($request !== null && $request->isXmlHttpRequest()) {
             return new SuccessHtmlView([
                 'html' => $this->renderView($view, $parameters),
             ]);
@@ -105,11 +104,15 @@ trait FormTrait
             $form = $this->container->get('form.factory')->create($form);
         }
 
-        $request = $this->container->get('request_stack')->getCurrentRequest();
+        $request = $this->getCurrentRequest();
+        if ($request === null) {
+            throw new \LogicException('Cannot handle form call without an active request.');
+        }
+
         $form->handleRequest($request);
 
         if (!$form->isSubmitted()) {
-            throw $this->createSubmittedFormRequiredException(\get_class($form));
+            throw $this->createSubmittedFormRequiredException($form::class);
         }
 
         return $this->createSubmittedFormResponse($form, $callable);
@@ -150,7 +153,7 @@ trait FormTrait
 
     protected function serializeFormErrors(FormInterface $form): array
     {
-        return $this->serialiseErrors($form->getErrors(true, false));
+        return $this->serializeErrors($form->getErrors(true, false));
     }
 
     protected function createNotXmlHttpRequestException(): XmlHttpRequestRequiredException
@@ -163,7 +166,12 @@ trait FormTrait
         return new SubmittedFormRequiredException($type);
     }
 
-    private function serialiseErrors(FormErrorIterator $iterator, array $paths = []): array
+    private function getCurrentRequest(): ?Request
+    {
+        return $this->container->get('request_stack')->getCurrentRequest();
+    }
+
+    private function serializeErrors(FormErrorIterator $iterator, array $paths = []): array
     {
         if ('' !== $name = $iterator->getForm()->getName()) {
             $paths[] = $name;
@@ -174,7 +182,7 @@ trait FormTrait
         $violations = [];
         foreach ($iterator as $formErrorIterator) {
             if ($formErrorIterator instanceof FormErrorIterator) {
-                $violations = \array_merge($violations, $this->serialiseErrors($formErrorIterator, $paths));
+                \array_push($violations, ...$this->serializeErrors($formErrorIterator, $paths));
                 continue;
             }
 

@@ -16,10 +16,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup PHP 8.4
+      - name: Setup PHP 8.5
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.4"
+          php-version: "8.5"
           tools: composer:v2
           coverage: none
 
@@ -32,9 +32,9 @@ jobs:
           path: |
             vendor
             ~/.composer/cache/files
-          key: ${{ runner.os }}-php-8.4-composer-${{ hashFiles('**/composer.lock') }}
+          key: ${{ runner.os }}-php-8.5-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: |
-            ${{ runner.os }}-php-8.4-composer-
+            ${{ runner.os }}-php-8.5-composer-
 
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress --no-interaction

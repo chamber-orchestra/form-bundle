@@ -29,4 +29,25 @@ final class JsonStringToArrayTransformerTest extends TestCase
 
         $transformer->reverseTransform('{');
     }
+
+    public function testTransformReturnsNullForNull(): void
+    {
+        $transformer = new JsonStringToArrayTransformer();
+
+        self::assertNull($transformer->transform(null));
+    }
+
+    public function testReverseTransformReturnsNullForNull(): void
+    {
+        $transformer = new JsonStringToArrayTransformer();
+
+        self::assertNull($transformer->reverseTransform(null));
+    }
+
+    public function testReverseTransformReturnsNullForEmptyString(): void
+    {
+        $transformer = new JsonStringToArrayTransformer();
+
+        self::assertNull($transformer->reverseTransform(''));
+    }
 }

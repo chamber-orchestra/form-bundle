@@ -195,7 +195,9 @@ final class FormTraitTest extends TestCase
         $stack->push($request);
 
         $container = $this->createStub(ContainerInterface::class);
-        $container->method('get')->with('request_stack')->willReturn($stack);
+        $container->method('get')->willReturnCallback(fn(string $id) => match ($id) {
+            'request_stack' => $stack,
+        });
 
         $host = new class($container) {
             use FormTrait;
@@ -234,7 +236,9 @@ final class FormTraitTest extends TestCase
         $stack->push($request);
 
         $container = $this->createStub(ContainerInterface::class);
-        $container->method('get')->with('request_stack')->willReturn($stack);
+        $container->method('get')->willReturnCallback(fn(string $id) => match ($id) {
+            'request_stack' => $stack,
+        });
 
         $host = new class($container) {
             use FormTrait;
@@ -273,7 +277,9 @@ final class FormTraitTest extends TestCase
         $stack->push($request);
 
         $container = $this->createStub(ContainerInterface::class);
-        $container->method('get')->with('request_stack')->willReturn($stack);
+        $container->method('get')->willReturnCallback(fn(string $id) => match ($id) {
+            'request_stack' => $stack,
+        });
 
         $host = new class($container) {
             use FormTrait;
@@ -316,7 +322,9 @@ final class FormTraitTest extends TestCase
         $stack->push($request);
 
         $container = $this->createStub(ContainerInterface::class);
-        $container->method('get')->with('request_stack')->willReturn($stack);
+        $container->method('get')->willReturnCallback(fn(string $id) => match ($id) {
+            'request_stack' => $stack,
+        });
 
         $host = new class($container) {
             use FormTrait;
@@ -348,5 +356,75 @@ final class FormTraitTest extends TestCase
 
         self::assertInstanceOf(Response::class, $response);
         self::assertSame('html', $response->getContent());
+    }
+
+    public function testHandleFormCallThrowsOnNullRequest(): void
+    {
+        $stack = new RequestStack();
+
+        $container = $this->createStub(ContainerInterface::class);
+        $container->method('get')->willReturnCallback(function (string $id) use ($stack) {
+            return match ($id) {
+                'request_stack' => $stack,
+                'form.factory' => Forms::createFormFactory(),
+            };
+        });
+        $container->method('has')->willReturn(true);
+
+        $host = new class($container) {
+            use FormTrait;
+
+            protected \Psr\Container\ContainerInterface $container;
+
+            public function __construct(ContainerInterface $container)
+            {
+                $this->container = $container;
+            }
+
+            public function exposeHandleFormCall(FormInterface|string $form): mixed
+            {
+                return $this->handleFormCall($form);
+            }
+        };
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Cannot handle form call without an active request.');
+
+        $host->exposeHandleFormCall(FormType::class);
+    }
+
+    public function testCreateRedirectResponseFallsBackWhenNoRequest(): void
+    {
+        $stack = new RequestStack();
+
+        $container = $this->createStub(ContainerInterface::class);
+        $container->method('get')->willReturnCallback(fn(string $id) => match ($id) {
+            'request_stack' => $stack,
+        });
+
+        $host = new class($container) {
+            use FormTrait;
+
+            protected \Psr\Container\ContainerInterface $container;
+
+            public function __construct(ContainerInterface $container)
+            {
+                $this->container = $container;
+            }
+
+            protected function redirect(string $url, int $status = 302): RedirectResponse
+            {
+                return new RedirectResponse($url, $status);
+            }
+
+            public function exposeCreateRedirectResponse(string $url, int $status): Response
+            {
+                return $this->createRedirectResponse($url, $status);
+            }
+        };
+
+        $response = $host->exposeCreateRedirectResponse('/target', Response::HTTP_FOUND);
+
+        self::assertInstanceOf(RedirectResponse::class, $response);
     }
 }

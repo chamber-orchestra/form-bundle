@@ -36,9 +36,7 @@ class TimestampType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        match ($options['input']) {
-            'datetime', 'datetime_immutable' => $builder->addModelTransformer(new DateTimeToNumberTransformer(DatePoint::class)),
-        };
+        $builder->addModelTransformer(new DateTimeToNumberTransformer(DatePoint::class));
     }
 
     public function getParent(): string
