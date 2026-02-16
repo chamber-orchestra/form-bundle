@@ -16,7 +16,7 @@ final class ApiFormTraitTest extends TestCase
 {
     public function testConvertRequestToArrayMergesJsonAndFiles(): void
     {
-        $host = new class() {
+        $host = new class {
             use ApiFormTrait;
 
             public function exposeConvertRequestToArray(Request $request): array
@@ -32,7 +32,7 @@ final class ApiFormTraitTest extends TestCase
             [],
             [],
             ['CONTENT_TYPE' => 'application/json'],
-            json_encode(['payload' => ['id' => 1]], JSON_THROW_ON_ERROR)
+            \json_encode(['payload' => ['id' => 1]], JSON_THROW_ON_ERROR)
         );
         $request->files->set('file', ['name' => 'upload.txt']);
 
@@ -43,7 +43,7 @@ final class ApiFormTraitTest extends TestCase
 
     public function testConvertRequestToArrayThrowsOnInvalidJson(): void
     {
-        $host = new class() {
+        $host = new class {
             use ApiFormTrait;
 
             public function exposeConvertRequestToArray(Request $request): array
@@ -69,7 +69,7 @@ final class ApiFormTraitTest extends TestCase
 
     public function testConvertRequestToArrayWithFilesOnly(): void
     {
-        $host = new class() {
+        $host = new class {
             use ApiFormTrait;
 
             public function exposeConvertRequestToArray(Request $request): array
@@ -91,7 +91,7 @@ final class ApiFormTraitTest extends TestCase
         $stack = new RequestStack();
 
         $container = $this->createStub(ContainerInterface::class);
-        $container->method('get')->willReturnCallback(fn(string $id) => match ($id) {
+        $container->method('get')->willReturnCallback(fn (string $id) => match ($id) {
             'request_stack' => $stack,
         });
 

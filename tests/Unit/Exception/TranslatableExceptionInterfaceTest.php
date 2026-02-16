@@ -13,7 +13,7 @@ final class TranslatableExceptionInterfaceTest extends TestCase
 {
     public function testTranslatableMessageIsReturned(): void
     {
-        $exception = new class() extends \RuntimeException implements TranslatableExceptionInterface {
+        $exception = new class extends \RuntimeException implements TranslatableExceptionInterface {
             public function getTranslatableMessage(): TranslatableInterface
             {
                 return new TranslatableMessage('error.key');

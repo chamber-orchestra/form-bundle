@@ -11,8 +11,7 @@ return static function (ContainerConfigurator $container): void {
 
     $services->defaults()
         ->autowire()
-        ->autoconfigure()
-        ->public(false);
+        ->autoconfigure();
 
     $services
         ->load('ChamberOrchestra\\FormBundle\\', __DIR__.'/../../')
@@ -27,7 +26,8 @@ return static function (ContainerConfigurator $container): void {
 
     $services
         ->set(ProblemNormalizer::class)
-        ->arg('$debug', '%kernel.debug%');
+        ->arg('$debug', '%kernel.debug%')
+        ->public();
 
     $services
         ->set(TelExtension::class)

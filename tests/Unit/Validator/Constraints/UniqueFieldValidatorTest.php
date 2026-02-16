@@ -32,7 +32,7 @@ final class UniqueFieldValidatorTest extends ConstraintValidatorTestCase
         $this->objectManager = $this->createMock(ObjectManager::class);
         $this->objectManager
             ->method('getRepository')
-            ->willReturnCallback(fn() => $this->repository);
+            ->willReturnCallback(fn () => $this->repository);
 
         $this->registry = $this->createMock(ManagerRegistry::class);
         $this->registry
@@ -91,7 +91,7 @@ final class UniqueFieldValidatorTest extends ConstraintValidatorTestCase
         $constraint = new UniqueField();
         $constraint->entityClass = DummyEntity::class;
         $constraint->fields = ['email'];
-        $constraint->exclude = static fn() => 'invalid';
+        $constraint->exclude = static fn () => 'invalid';
 
         $this->expectException(ConstraintDefinitionException::class);
 
@@ -117,7 +117,7 @@ final class UniqueFieldValidatorTest extends ConstraintValidatorTestCase
         $constraint = new UniqueField();
         $constraint->entityClass = DummyEntity::class;
         $constraint->fields = ['email'];
-        $constraint->normalizer = static fn() => null;
+        $constraint->normalizer = static fn () => null;
 
         $this->validator->validate('value', $constraint);
 
@@ -171,7 +171,7 @@ final class SelectableRepository implements Selectable, ObjectRepository
 
     public function matching(Criteria $criteria): ArrayCollection
     {
-        return new ArrayCollection(array_fill(0, $this->count, new \stdClass()));
+        return new ArrayCollection(\array_fill(0, $this->count, new \stdClass()));
     }
 
     public function find(mixed $id): ?object

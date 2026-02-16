@@ -14,9 +14,10 @@ namespace ChamberOrchestra\FormBundle\Transformer;
 use ChamberOrchestra\FormBundle\Exception\TransformationFailedException;
 use Symfony\Component\Form\DataTransformerInterface;
 
+/** @implements DataTransformerInterface<array<mixed>|null, string|null> */
 readonly class JsonStringToArrayTransformer implements DataTransformerInterface
 {
-    public function transform($value): string|null
+    public function transform(mixed $value): ?string
     {
         if (null === $value) {
             return null;
@@ -31,18 +32,20 @@ readonly class JsonStringToArrayTransformer implements DataTransformerInterface
         return $value;
     }
 
-    public function reverseTransform($value): array|null
+    /** @return array<mixed>|null */
+    public function reverseTransform(mixed $value): ?array
     {
         if (null === $value || '' === $value) {
             return null;
         }
 
         try {
-            $value = \json_decode($value, true, 512, JSON_BIGINT_AS_STRING | JSON_THROW_ON_ERROR);
+            /** @var array<mixed> $decoded */
+            $decoded = \json_decode($value, true, 512, JSON_BIGINT_AS_STRING | JSON_THROW_ON_ERROR);
         } catch (\JsonException $e) {
             throw new TransformationFailedException(\sprintf('Could not parse JSON into array.'), $e->getCode(), $e);
         }
 
-        return $value;
+        return $decoded;
     }
 }

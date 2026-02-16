@@ -13,7 +13,8 @@ namespace ChamberOrchestra\FormBundle\Exception;
 
 class TransformationFailedException extends \Symfony\Component\Form\Exception\TransformationFailedException implements ExceptionInterface
 {
-    public static function notAllowedType($id, array $allowedTypes): TransformationFailedException
+    /** @param list<string> $allowedTypes */
+    public static function notAllowedType(mixed $id, array $allowedTypes): TransformationFailedException
     {
         return new self(
             \sprintf(

@@ -33,7 +33,7 @@ final class BooleanTypeTest extends TestCase
         $builder
             ->expects($this->once())
             ->method('addModelTransformer')
-            ->with($this->callback(static fn($transformer) => $transformer instanceof TextToBoolTransformer));
+            ->with($this->callback(static fn ($transformer) => $transformer instanceof TextToBoolTransformer));
 
         $type->buildForm($builder, [
             'true_values' => [1],

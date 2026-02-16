@@ -30,7 +30,7 @@ class UniqueFieldValidator extends ConstraintValidator
     {
     }
 
-    public function validate($value, Constraint $constraint): void
+    public function validate(mixed $value, Constraint $constraint): void
     {
         if (!$constraint instanceof UniqueField) {
             throw new UnexpectedTypeException($constraint, UniqueField::class);
@@ -62,7 +62,7 @@ class UniqueFieldValidator extends ConstraintValidator
         $this->addViolation($constraint, $value);
     }
 
-    private function addViolation(UniqueField $constraint, $value): void
+    private function addViolation(UniqueField $constraint, mixed $value): void
     {
         $builder = $this->context->buildViolation($constraint->message);
         if ($constraint->errorPath) {
@@ -82,19 +82,19 @@ class UniqueFieldValidator extends ConstraintValidator
             ->addViolation();
     }
 
+    /** @return Selectable<int, object>&\Doctrine\Persistence\ObjectRepository<object> */
     private function getRepository(UniqueField $constraint): Selectable
     {
+        if (null === $constraint->entityClass) {
+            throw new ConstraintDefinitionException('UniqueField constraint requires "entityClass" to be set.');
+        }
+
         $manager = $this->getManager($constraint);
+        /** @var \Doctrine\Persistence\ObjectRepository<object> $repository */
         $repository = $manager->getRepository($constraint->entityClass);
 
         if (!$repository instanceof Selectable) {
-            throw new LogicException(
-                \sprintf(
-                    '%s does not implement %s which is required for Unique validation',
-                    \get_class($repository),
-                    Selectable::class
-                )
-            );
+            throw new LogicException(\sprintf('%s does not implement %s which is required for Unique validation', $repository::class, Selectable::class));
         }
 
         return $repository;
@@ -106,17 +106,19 @@ class UniqueFieldValidator extends ConstraintValidator
             return $this->doctrine->getManager($constraint->em);
         }
 
+        if (null === $constraint->entityClass) {
+            throw new ConstraintDefinitionException('UniqueField constraint requires "entityClass" to be set.');
+        }
+
         $em = $this->doctrine->getManagerForClass($constraint->entityClass);
         if (null === $em) {
-            throw new ConstraintDefinitionException(
-                \sprintf('Class "%s" is not managed by Doctrine.', $constraint->entityClass)
-            );
+            throw new ConstraintDefinitionException(\sprintf('Class "%s" is not managed by Doctrine.', $constraint->entityClass));
         }
 
         return $em;
     }
 
-    private function buildComparison(string $field, $value, bool $negative = false): Comparison
+    private function buildComparison(string $field, mixed $value, bool $negative = false): Comparison
     {
         $operation = $negative ? Comparison::NEQ : Comparison::EQ;
 
@@ -137,9 +139,9 @@ class UniqueFieldValidator extends ConstraintValidator
         $criteria->orWhere($comparison);
     }
 
-    private function buildCriteria(UniqueField $constraint, $value, $origin): Criteria
+    private function buildCriteria(UniqueField $constraint, mixed $value, mixed $origin): Criteria
     {
-        $criteria = Criteria::create(true);
+        $criteria = Criteria::create();
 
         // build includes fields with OR join
         foreach ($constraint->fields as $field) {
@@ -172,12 +174,11 @@ class UniqueFieldValidator extends ConstraintValidator
         return $criteria;
     }
 
+    /** @phpstan-assert non-empty-string $field */
     private function assertValidFieldName(mixed $field): void
     {
         if (!\is_string($field) || !\preg_match('/^[a-zA-Z_][a-zA-Z0-9_.]*$/', $field)) {
-            throw new ConstraintDefinitionException(
-                \sprintf('Invalid field name "%s" in constraint criteria.', $field)
-            );
+            throw new ConstraintDefinitionException(\sprintf('Invalid field name "%s" in constraint criteria.', \is_string($field) ? $field : \get_debug_type($field)));
         }
     }
 }

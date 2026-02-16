@@ -13,19 +13,23 @@ namespace ChamberOrchestra\FormBundle;
 
 use ChamberOrchestra\FormBundle\Type\Api\MutationForm;
 use ChamberOrchestra\ViewBundle\View\ViewInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
+/**
+ * @phpstan-require-extends AbstractController
+ */
 trait ApiFormTrait
 {
     use FormTrait;
 
-    protected function handleApiCall(FormInterface|string $form, callable|null $callable = null): Response|ViewInterface
+    protected function handleApiCall(FormInterface|string $form, ?callable $callable = null): Response|ViewInterface
     {
         $request = $this->getCurrentRequest();
-        if ($request === null) {
+        if (null === $request) {
             throw new \LogicException('Cannot handle API call without an active request.');
         }
 
@@ -46,6 +50,7 @@ trait ApiFormTrait
         return $this->onFormSubmitted($form, $callable);
     }
 
+    /** @return array<string, mixed> */
     private function convertRequestToArray(Request $request): array
     {
         $data = [];

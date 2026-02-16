@@ -18,26 +18,32 @@ class ValidationFailedView extends FailureView
 {
     protected string $type = 'https://symfony.com/errors/validation';
     protected string $detail;
+    /** @var list<ViolationView> */
     protected array $violations;
 
+    /** @param list<ViolationView> $violations */
     public function __construct(array $violations = [], string $message = 'Validation Failed')
     {
-        $this->detail = \implode("\n", \array_map(fn(ViolationView $error): string => $error->title, $violations));
+        $this->detail = \implode("\n", \array_map(fn (ViolationView $error): string => $error->title, $violations));
         $this->violations = $violations;
 
         parent::__construct(JsonResponse::HTTP_UNPROCESSABLE_ENTITY, $message);
     }
 
+    /** @param array<string, mixed> $context */
     public function normalize(
         NormalizerInterface $normalizer,
         ?string $format = null,
         array $context = []
     ): array|string|int|float|bool {
-        return $normalizer->normalize([
+        /** @var array<string, mixed> $data */
+        $data = $normalizer->normalize([
             'title' => $this->title,
             'type' => $this->type,
             'detail' => $this->detail,
             'violations' => $this->violations,
         ], $format, $context);
+
+        return $data;
     }
 }

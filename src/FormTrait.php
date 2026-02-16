@@ -31,9 +31,12 @@ use Symfony\Component\Validator\ConstraintViolation;
 
 /**
  * @mixin AbstractController
+ *
+ * @phpstan-require-extends AbstractController
  */
 trait FormTrait
 {
+    /** @param array<string, mixed> $data */
     protected function createSuccessResponse(array $data = []): DataView|ResponseView
     {
         return $data ? new DataView($data) : new ResponseView();
@@ -44,13 +47,16 @@ trait FormTrait
         int $status = Response::HTTP_MOVED_PERMANENTLY
     ): Response|RedirectView {
         $request = $this->getCurrentRequest();
-        if ($request !== null && $request->isXmlHttpRequest()) {
+        if (null !== $request && $request->isXmlHttpRequest()) {
             return new RedirectView($url, $status);
         }
 
         return $this->redirect($url, $status);
     }
 
+    /**
+     * @param array<string, mixed> $parameters
+     */
     protected function createRedirectToRouteResponse(
         string $name,
         array $parameters = [],
@@ -64,10 +70,11 @@ trait FormTrait
         return $this->createFailureResponse(Response::HTTP_INTERNAL_SERVER_ERROR);
     }
 
+    /** @param array<string, mixed> $parameters */
     protected function createSuccessHtmlResponse(string $view, array $parameters = []): Response|SuccessHtmlView
     {
         $request = $this->getCurrentRequest();
-        if ($request !== null && $request->isXmlHttpRequest()) {
+        if (null !== $request && $request->isXmlHttpRequest()) {
             return new SuccessHtmlView([
                 'html' => $this->renderView($view, $parameters),
             ]);
@@ -88,16 +95,10 @@ trait FormTrait
 
     protected function handleFormCall(
         FormInterface|string $form,
-        callable|null $callable = null
+        ?callable $callable = null
     ): Response|ViewInterface {
         if (!\is_string($form) && !$form instanceof FormInterface) {
-            throw new \TypeError(
-                \sprintf(
-                    'Passed $form must be of type "%s", "%s" given.',
-                    \implode(',', ['string', FormInterface::class]),
-                    \get_debug_type($form)
-                )
-            );
+            throw new \TypeError(\sprintf('Passed $form must be of type "%s", "%s" given.', \implode(',', ['string', FormInterface::class]), \get_debug_type($form)));
         }
 
         if (\is_string($form)) {
@@ -105,7 +106,7 @@ trait FormTrait
         }
 
         $request = $this->getCurrentRequest();
-        if ($request === null) {
+        if (null === $request) {
             throw new \LogicException('Cannot handle form call without an active request.');
         }
 
@@ -120,15 +121,15 @@ trait FormTrait
 
     protected function createSubmittedFormResponse(
         FormInterface $form,
-        callable|null $callable = null
+        ?callable $callable = null
     ): Response|ViewInterface {
         return $this->onFormSubmitted($form, $callable);
     }
 
     /**
-     * @param null|callable $callable must return @see \ChamberOrchestra\ViewBundle\View\ViewInterface, array or null
+     * @param callable|null $callable must return @see \ChamberOrchestra\ViewBundle\View\ViewInterface, array or null
      */
-    protected function onFormSubmitted(FormInterface $form, callable|null $callable = null): Response|ViewInterface
+    protected function onFormSubmitted(FormInterface $form, ?callable $callable = null): Response|ViewInterface
     {
         if (!$form->isValid()) {
             return $this->createValidationFailedResponse($form);
@@ -139,18 +140,13 @@ trait FormTrait
         }
 
         if (!\is_array($response) && !$response instanceof ViewInterface && !$response instanceof Response) {
-            throw new \TypeError(
-                \sprintf(
-                    'Passed closure must return %s, returned %s',
-                    \implode('|', [ViewInterface::class, Response::class, 'array']),
-                    \get_debug_type($response)
-                )
-            );
+            throw new \TypeError(\sprintf('Passed closure must return %s, returned %s', \implode('|', [ViewInterface::class, Response::class, 'array']), \get_debug_type($response)));
         }
 
         return \is_array($response) ? $this->createSuccessResponse($response) : $response;
     }
 
+    /** @return list<ViolationView> */
     protected function serializeFormErrors(FormInterface $form): array
     {
         return $this->serializeErrors($form->getErrors(true, false));
@@ -171,6 +167,11 @@ trait FormTrait
         return $this->container->get('request_stack')->getCurrentRequest();
     }
 
+    /**
+     * @param list<string> $paths
+     *
+     * @return list<ViolationView>
+     */
     private function serializeErrors(FormErrorIterator $iterator, array $paths = []): array
     {
         if ('' !== $name = $iterator->getForm()->getName()) {

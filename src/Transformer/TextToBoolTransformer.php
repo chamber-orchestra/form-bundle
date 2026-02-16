@@ -14,15 +14,20 @@ namespace ChamberOrchestra\FormBundle\Transformer;
 use ChamberOrchestra\FormBundle\Exception\TransformationFailedException;
 use Symfony\Component\Form\DataTransformerInterface;
 
+/** @implements DataTransformerInterface<bool|null, bool> */
 readonly class TextToBoolTransformer implements DataTransformerInterface
 {
+    /**
+     * @param list<mixed> $trueValues
+     * @param list<mixed> $falseValues
+     */
     public function __construct(
         private array $trueValues,
         private array $falseValues,
     ) {
     }
 
-    public function transform($value): bool
+    public function transform(mixed $value): bool
     {
         if (null === $value) {
             return false;
@@ -35,7 +40,7 @@ readonly class TextToBoolTransformer implements DataTransformerInterface
         return $value;
     }
 
-    public function reverseTransform($value): bool
+    public function reverseTransform(mixed $value): bool
     {
         if (null === $value) {
             return false;

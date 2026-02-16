@@ -19,7 +19,7 @@ final class ProblemNormalizerIntegrationTest extends TestCase
         $kernel->boot();
 
         $normalizer = $kernel->getContainer()->get(ProblemNormalizer::class);
-        $exception = new class() extends \RuntimeException implements TranslatableExceptionInterface {
+        $exception = new class extends \RuntimeException implements TranslatableExceptionInterface {
             public function getTranslatableMessage(): TranslatableInterface
             {
                 return new TranslatableMessage('error.key');

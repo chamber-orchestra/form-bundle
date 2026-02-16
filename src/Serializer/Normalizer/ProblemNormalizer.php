@@ -17,6 +17,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 class ProblemNormalizer extends Normalizer
 {
+    /** @param array<string, mixed> $defaultContext */
     public function __construct(
         private readonly TranslatorInterface $translator,
         bool $debug = false,
@@ -25,6 +26,7 @@ class ProblemNormalizer extends Normalizer
         parent::__construct($debug, $defaultContext);
     }
 
+    /** @param array<string, mixed> $context */
     public function normalize(mixed $object, ?string $format = null, array $context = []): array
     {
         $data = parent::normalize($object, $format, $context);
