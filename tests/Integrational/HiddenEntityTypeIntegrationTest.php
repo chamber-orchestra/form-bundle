@@ -15,7 +15,7 @@ final class HiddenEntityTypeIntegrationTest extends KernelTestCase
 {
     public function testTransformsEntityToIdAndBackWithDoctrine(): void
     {
-        if (!class_exists(\Doctrine\Bundle\DoctrineBundle\DoctrineBundle::class)) {
+        if (!\class_exists(\Doctrine\Bundle\DoctrineBundle\DoctrineBundle::class)) {
             $this->markTestSkipped('doctrine/doctrine-bundle is required for this integration test.');
         }
 
@@ -36,13 +36,13 @@ final class HiddenEntityTypeIntegrationTest extends KernelTestCase
             'data_class' => null,
         ]);
 
-        self::assertSame((string)$user->id, $form->getViewData());
+        self::assertSame((string) $user->id, $form->getViewData());
 
         $submitForm = $factory->create(HiddenEntityType::class, null, [
             'class' => TestUser::class,
             'data_class' => null,
         ]);
-        $submitForm->submit((string)$user->id);
+        $submitForm->submit((string) $user->id);
 
         self::assertSame($user->id, $submitForm->getData()?->id);
     }

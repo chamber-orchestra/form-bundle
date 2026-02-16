@@ -25,7 +25,7 @@ final class FormTraitTest extends TestCase
 {
     public function testCreateSuccessResponseReturnsDataViewWhenDataProvided(): void
     {
-        $host = new class() {
+        $host = new class {
             use FormTrait;
 
             public function exposeCreateSuccessResponse(array $data = []): DataView|ResponseView
@@ -41,7 +41,7 @@ final class FormTraitTest extends TestCase
 
     public function testCreateSuccessResponseReturnsResponseViewWhenEmpty(): void
     {
-        $host = new class() {
+        $host = new class {
             use FormTrait;
 
             public function exposeCreateSuccessResponse(array $data = []): DataView|ResponseView
@@ -57,7 +57,7 @@ final class FormTraitTest extends TestCase
 
     public function testOnFormSubmittedReturnsValidationFailedViewWhenInvalid(): void
     {
-        $host = new class() {
+        $host = new class {
             use FormTrait;
 
             public function exposeOnFormSubmitted(FormInterface $form, ?callable $callable = null)
@@ -81,7 +81,7 @@ final class FormTraitTest extends TestCase
 
     public function testOnFormSubmittedReturnsDataViewFromCallable(): void
     {
-        $host = new class() {
+        $host = new class {
             use FormTrait;
 
             public function exposeOnFormSubmitted(FormInterface $form, ?callable $callable = null)
@@ -94,14 +94,14 @@ final class FormTraitTest extends TestCase
         $form->method('isValid')->willReturn(true);
         $form->method('getData')->willReturn(['id' => 1]);
 
-        $response = $host->exposeOnFormSubmitted($form, fn() => ['ok' => true]);
+        $response = $host->exposeOnFormSubmitted($form, fn () => ['ok' => true]);
 
         self::assertInstanceOf(DataView::class, $response);
     }
 
     public function testSerializeFormErrorsBuildsViolationStructure(): void
     {
-        $host = new class() {
+        $host = new class {
             use FormTrait;
 
             public function exposeSerializeFormErrors(FormInterface $form): array
@@ -144,7 +144,7 @@ final class FormTraitTest extends TestCase
 
     public function testSerializeFormErrorsBuildsViolationStructureForEmbeddedForm(): void
     {
-        $host = new class() {
+        $host = new class {
             use FormTrait;
 
             public function exposeSerializeFormErrors(FormInterface $form): array
@@ -195,7 +195,7 @@ final class FormTraitTest extends TestCase
         $stack->push($request);
 
         $container = $this->createStub(ContainerInterface::class);
-        $container->method('get')->willReturnCallback(fn(string $id) => match ($id) {
+        $container->method('get')->willReturnCallback(fn (string $id) => match ($id) {
             'request_stack' => $stack,
         });
 
@@ -236,7 +236,7 @@ final class FormTraitTest extends TestCase
         $stack->push($request);
 
         $container = $this->createStub(ContainerInterface::class);
-        $container->method('get')->willReturnCallback(fn(string $id) => match ($id) {
+        $container->method('get')->willReturnCallback(fn (string $id) => match ($id) {
             'request_stack' => $stack,
         });
 
@@ -277,7 +277,7 @@ final class FormTraitTest extends TestCase
         $stack->push($request);
 
         $container = $this->createStub(ContainerInterface::class);
-        $container->method('get')->willReturnCallback(fn(string $id) => match ($id) {
+        $container->method('get')->willReturnCallback(fn (string $id) => match ($id) {
             'request_stack' => $stack,
         });
 
@@ -322,7 +322,7 @@ final class FormTraitTest extends TestCase
         $stack->push($request);
 
         $container = $this->createStub(ContainerInterface::class);
-        $container->method('get')->willReturnCallback(fn(string $id) => match ($id) {
+        $container->method('get')->willReturnCallback(fn (string $id) => match ($id) {
             'request_stack' => $stack,
         });
 
@@ -398,7 +398,7 @@ final class FormTraitTest extends TestCase
         $stack = new RequestStack();
 
         $container = $this->createStub(ContainerInterface::class);
-        $container->method('get')->willReturnCallback(fn(string $id) => match ($id) {
+        $container->method('get')->willReturnCallback(fn (string $id) => match ($id) {
             'request_stack' => $stack,
         });
 

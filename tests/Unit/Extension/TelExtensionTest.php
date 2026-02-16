@@ -14,7 +14,7 @@ final class TelExtensionTest extends TestCase
 {
     public function testExtendedTypes(): void
     {
-        self::assertSame([TelType::class], iterator_to_array(TelExtension::getExtendedTypes()));
+        self::assertSame([TelType::class], \iterator_to_array(TelExtension::getExtendedTypes()));
     }
 
     public function testBuildFormAddsTransformer(): void

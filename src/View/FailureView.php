@@ -26,14 +26,18 @@ class FailureView extends ResponseView
         parent::__construct($status, ['Content-Type' => 'application/problem+json']);
     }
 
+    /** @param array<string, mixed> $context */
     public function normalize(
         NormalizerInterface $normalizer,
         ?string $format = null,
         array $context = []
     ): array|string|int|float|bool {
-        return $normalizer->normalize([
+        /** @var array<string, mixed> $data */
+        $data = $normalizer->normalize([
             'type' => $this->type,
             'title' => $this->title,
         ], $format, $context);
+
+        return $data;
     }
 }

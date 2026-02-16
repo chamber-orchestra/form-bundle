@@ -23,52 +23,60 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/** @extends AbstractType<object|null> */
 class HiddenEntityType extends AbstractType
 {
     public function __construct(private readonly EntityManagerInterface $em)
     {
     }
 
+    /** @param array<string, mixed> $options */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $em = $this->em;
+        /** @var class-string $entityClass */
+        $entityClass = $options['class'];
+        /** @var string $choiceValue */
+        $choiceValue = $options['choice_value'];
+        /** @var QueryBuilder|null $queryBuilder */
+        $queryBuilder = $options['query_builder'];
+
         $builder->addViewTransformer(
             new CallbackTransformer(
-                function (object|null $value) use ($options, $em): string|null {
+                function (?object $value) use ($entityClass, $choiceValue, $em): string|null {
                     if (null === $value) {
                         return null;
                     }
 
-                    $class = $em->getClassMetadata($options['class']);
-                    $id = $class->getFieldValue($value, $options['choice_value']);
+                    $class = $em->getClassMetadata($entityClass);
+                    $id = $class->getFieldValue($value, $choiceValue);
 
                     if (!\is_scalar($id) && (!\is_object($id) || !\method_exists($id, '__toString'))) {
                         throw TransformationFailedException::notAllowedType($value, ['scalar', 'string']);
                     }
 
-                    return (string)$id;
+                    return (string) $id;
                 },
-                function (mixed $id) use ($options, $em): object|null {
+                function (mixed $id) use ($entityClass, $choiceValue, $queryBuilder, $em): object|null {
                     if (!\is_scalar($id)) {
                         throw TransformationFailedException::notAllowedType($id, ['scalar']);
                     }
 
-                    if ($id === null || $id === false || $id === '') {
+                    if (false === $id || '' === $id) {
                         return null;
                     }
 
-                    if (null !== $options['query_builder']) {
-                        $qb = $this->prepareQueryBuilder($options['query_builder'], $options['choice_value'], $id);
+                    if (null !== $queryBuilder) {
+                        $qb = $this->prepareQueryBuilder($queryBuilder, $choiceValue, $id);
+                        /** @var object|null $entity */
                         $entity = $qb->getQuery()->getOneOrNullResult();
                     } else {
-                        $er = $em->getRepository($options['class']);
-                        $entity = $er->findOneBy([$options['choice_value'] => (string)$id]);
+                        $er = $em->getRepository($entityClass);
+                        $entity = $er->findOneBy([$choiceValue => (string) $id]);
                     }
 
                     if (null === $entity) {
-                        throw new TransformationFailedException(
-                            \sprintf("Object of class '%s' was not found.", $options['class'])
-                        );
+                        throw new TransformationFailedException(\sprintf("Object of class '%s' was not found.", $entityClass));
                     }
 
                     return $entity;
@@ -91,13 +99,14 @@ class HiddenEntityType extends AbstractType
         $resolver
             ->setRequired('class')
             ->setAllowedTypes('class', 'string')
-            ->setAllowedValues('class', function ($value) use ($em): bool {
+            ->setAllowedValues('class', function (string $value) use ($em): bool {
                 if (!\class_exists($value)) {
                     return false;
                 }
 
                 try {
                     $em->getClassMetadata($value);
+
                     return true;
                 } catch (\Throwable) {
                     return false;
@@ -106,23 +115,23 @@ class HiddenEntityType extends AbstractType
 
         $resolver
             ->setAllowedTypes('query_builder', ['null', 'callable', QueryBuilder::class])
-            ->setNormalizer('query_builder', function (Options $options, $value) use ($em): ?QueryBuilder {
+            ->setNormalizer('query_builder', function (Options $options, mixed $value) use ($em): ?QueryBuilder {
                 if (null === $value || $value instanceof QueryBuilder) {
                     return $value;
                 }
 
-                /** @var EntityRepository $er */
-                $er = $em->getRepository($options['class']);
-                $qb = \call_user_func($value, $er);
+                if (!\is_callable($value)) {
+                    throw new InvalidArgumentException('Parameter "query_builder" must be callable, QueryBuilder or null.');
+                }
+
+                /** @var class-string $class */
+                $class = $options['class'];
+                /** @var EntityRepository<object> $er */
+                $er = $em->getRepository($class);
+                $qb = $value($er);
 
                 if (!$qb instanceof QueryBuilder) {
-                    throw new InvalidArgumentException(
-                        \sprintf(
-                            'Parameter "query_builder" must return instance of "%s", "%s" returned.',
-                            QueryBuilder::class,
-                            \get_debug_type($qb)
-                        )
-                    );
+                    throw new InvalidArgumentException(\sprintf('Parameter "query_builder" must return instance of "%s", "%s" returned.', QueryBuilder::class, \get_debug_type($qb)));
                 }
 
                 return $qb;
@@ -130,17 +139,18 @@ class HiddenEntityType extends AbstractType
 
         $resolver
             ->setAllowedTypes('choice_value', ['null', 'string'])
-            ->setNormalizer('choice_value', function (Options $options, $value) use ($em) {
-                $class = $em->getClassMetadata($options['class']);
+            ->setNormalizer('choice_value', function (Options $options, mixed $value) use ($em): string {
+                /** @var class-string $entityClass */
+                $entityClass = $options['class'];
+                $class = $em->getClassMetadata($entityClass);
 
                 if (null === $value) {
                     return $class->getSingleIdentifierFieldName();
                 }
 
+                /** @var string $value */
                 if (!$class->hasField($value)) {
-                    throw new InvalidArgumentException(
-                        \sprintf('Class "%s" does not have field with name "%s".', $options['class'], $value)
-                    );
+                    throw new InvalidArgumentException(\sprintf('Class "%s" does not have field with name "%s".', $entityClass, $value));
                 }
 
                 return $value;
@@ -155,9 +165,7 @@ class HiddenEntityType extends AbstractType
     private function prepareQueryBuilder(QueryBuilder $qb, string $idFieldName, mixed $id): QueryBuilder
     {
         if (!\preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $idFieldName)) {
-            throw new InvalidArgumentException(
-                \sprintf('Invalid field name "%s".', $idFieldName)
-            );
+            throw new InvalidArgumentException(\sprintf('Invalid field name "%s".', $idFieldName));
         }
 
         $aliases = $qb->getRootAliases();

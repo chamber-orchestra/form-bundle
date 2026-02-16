@@ -15,12 +15,15 @@ use ChamberOrchestra\ViewBundle\View\View;
 
 class ViolationView extends View
 {
+    /**
+     * @param array<string, string> $parameters
+     */
     public function __construct(
         public string $id,
         public string $title,
         public array $parameters,
         public string $propertyPath,
-        public string|null $type = null,
+        public ?string $type = null,
     ) {
     }
 }

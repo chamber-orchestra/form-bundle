@@ -23,14 +23,15 @@ class TelExtension extends AbstractTypeExtension
         return [TelType::class];
     }
 
+    /** @param array<string, mixed> $options */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addViewTransformer(
             new CallbackTransformer(
-                function (string|null $value): string|null {
+                function (?string $value): ?string {
                     return $value;
                 },
-                function (string|null $value): string|null {
+                function (?string $value): ?string {
                     if (null === $value || '' === $value) {
                         return null;
                     }

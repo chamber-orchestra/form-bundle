@@ -16,19 +16,25 @@ use Doctrine\Common\Collections\Collection;
 
 final class CollectionUtils
 {
+    /**
+     * @template T of object
+     *
+     * @param Collection<int, T> $source
+     * @param iterable<T>        $target
+     */
     public static function sync(Collection $source, iterable $target): void
     {
         $clone = clone $source;
         $target = new ArrayCollection(\is_array($target) ? $target : \iterator_to_array($target));
 
-        //add new
+        // add new
         foreach ($target as $item) {
             if (!$clone->contains($item)) {
                 $source->add($item);
             }
         }
 
-        //remove old
+        // remove old
         foreach ($clone as $item) {
             if (!$target->contains($item)) {
                 $source->removeElement($item);

@@ -61,7 +61,7 @@ final class HiddenEntityTypeTest extends TestCase
         $builder
             ->expects($this->once())
             ->method('addViewTransformer')
-            ->with($this->callback(static fn($transformer) => $transformer instanceof CallbackTransformer));
+            ->with($this->callback(static fn ($transformer) => $transformer instanceof CallbackTransformer));
 
         $type->buildForm($builder, [
             'class' => DummyEntity::class,

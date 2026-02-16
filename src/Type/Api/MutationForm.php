@@ -14,6 +14,7 @@ namespace ChamberOrchestra\FormBundle\Type\Api;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/** @extends AbstractType<mixed> */
 abstract class MutationForm extends AbstractType
 {
     public function configureOptions(OptionsResolver $resolver): void

@@ -15,7 +15,7 @@ final class UniqueFieldValidatorIntegrationTest extends KernelTestCase
 {
     public function testUniqueFieldValidatorDetectsDuplicates(): void
     {
-        if (!class_exists(\Doctrine\Bundle\DoctrineBundle\DoctrineBundle::class)) {
+        if (!\class_exists(\Doctrine\Bundle\DoctrineBundle\DoctrineBundle::class)) {
             $this->markTestSkipped('doctrine/doctrine-bundle is required for this integration test.');
         }
 

@@ -1,19 +1,32 @@
 {
   "name": "chamber-orchestra/form-bundle",
-  "type": "library",
-  "description": "Symfony 8 bundle for JSON-first API form handling with RFC 9110 error responses, data transformers, and Doctrine validation",
+  "type": "symfony-bundle",
+  "description": "Symfony 8 bundle for JSON-first API form handling with controller traits, data transformers, Doctrine validation, and RFC 9457 problem details error responses",
   "keywords": [
     "symfony",
+    "symfony-bundle",
     "symfony8",
     "form",
+    "form-handling",
     "api",
     "json",
+    "json-api",
     "rest",
-    "rfc9110",
+    "rest-api",
+    "rfc9457",
+    "problem-details",
     "validation",
     "doctrine",
-    "data-transformer"
+    "data-transformer",
+    "error-handling",
+    "form-type",
+    "csrf"
   ],
+  "homepage": "https://github.com/chamber-orchestra/form-bundle",
+  "support": {
+    "issues": "https://github.com/chamber-orchestra/form-bundle/issues",
+    "source": "https://github.com/chamber-orchestra/form-bundle"
+  },
   "license": "MIT",
   "authors": [
     {
@@ -39,7 +52,11 @@
   "require-dev": {
     "phpunit/phpunit": "^13.0",
     "symfony/test-pack": "^1.2",
-    "doctrine/doctrine-bundle": "^3.2"
+    "doctrine/doctrine-bundle": "^3.2",
+    "phpstan/phpstan": "^2.1",
+    "phpstan/phpstan-symfony": "^2.0",
+    "phpstan/phpstan-doctrine": "^2.0",
+    "friendsofphp/php-cs-fixer": "^3.94"
   },
   "autoload": {
     "psr-4": {
@@ -67,6 +84,9 @@
     }
   },
   "scripts": {
-    "test": "vendor/bin/phpunit"
+    "test": "vendor/bin/phpunit",
+    "analyse": "vendor/bin/phpstan analyse",
+    "cs-check": "vendor/bin/php-cs-fixer fix --dry-run --diff",
+    "cs-fix": "vendor/bin/php-cs-fixer fix"
   }
 }
