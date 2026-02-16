@@ -5,6 +5,7 @@
 ![Symfony 8](https://img.shields.io/badge/Symfony-8-000000?logo=symfony&logoColor=white)
 ![PHPStan Max](https://img.shields.io/badge/PHPStan-max-brightgreen?logo=php&logoColor=white)
 ![PHP-CS-Fixer](https://img.shields.io/badge/PHP--CS--Fixer-✓-brightgreen?logo=php&logoColor=white)
+![Code Style: PER-CS & Symfony](https://img.shields.io/badge/Code%20Style-PER--CS%20%26%20Symfony-blue?logo=symfony&logoColor=white)
 
 # ChamberOrchestra Form Bundle
 
