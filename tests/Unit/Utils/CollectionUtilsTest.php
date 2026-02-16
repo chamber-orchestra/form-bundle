@@ -17,6 +17,6 @@ final class CollectionUtilsTest extends TestCase
 
         CollectionUtils::sync($source, $target);
 
-        self::assertSame([2, 3, 4], array_values($source->toArray()));
+        self::assertSame([2, 3, 4], \array_values($source->toArray()));
     }
 }

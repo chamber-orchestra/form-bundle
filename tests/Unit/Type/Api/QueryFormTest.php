@@ -13,7 +13,7 @@ final class QueryFormTest extends TestCase
 {
     public function testParentAndBlockPrefix(): void
     {
-        $form = new class() extends QueryForm {};
+        $form = new class extends QueryForm {};
 
         self::assertSame('', $form->getBlockPrefix());
         self::assertSame(GetForm::class, $form->getParent());
@@ -21,7 +21,7 @@ final class QueryFormTest extends TestCase
 
     public function testCsrfProtectionIsDisabled(): void
     {
-        $form = new class() extends QueryForm {};
+        $form = new class extends QueryForm {};
         $resolver = new OptionsResolver();
 
         $form->configureOptions($resolver);

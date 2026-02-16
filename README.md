@@ -1,6 +1,10 @@
 [![PHP Composer](https://github.com/chamber-orchestra/form-bundle/actions/workflows/php.yml/badge.svg)](https://github.com/chamber-orchestra/form-bundle/actions/workflows/php.yml)
 [![Latest Stable Version](https://poser.pugx.org/chamber-orchestra/form-bundle/v)](https://packagist.org/packages/chamber-orchestra/form-bundle)
 [![License](https://poser.pugx.org/chamber-orchestra/form-bundle/license)](https://packagist.org/packages/chamber-orchestra/form-bundle)
+![PHP 8.5](https://img.shields.io/badge/PHP-8.5-777BB4?logo=php&logoColor=white)
+![Symfony 8](https://img.shields.io/badge/Symfony-8-000000?logo=symfony&logoColor=white)
+![PHPStan Max](https://img.shields.io/badge/PHPStan-max-brightgreen?logo=php&logoColor=white)
+![PHP-CS-Fixer](https://img.shields.io/badge/PHP--CS--Fixer-✓-brightgreen?logo=php&logoColor=white)
 
 # ChamberOrchestra Form Bundle
 

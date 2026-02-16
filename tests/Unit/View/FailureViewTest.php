@@ -27,7 +27,7 @@ final class FailureViewTest extends TestCase
         $normalizer
             ->expects($this->once())
             ->method('normalize')
-            ->willReturnCallback(static fn(array $data) => $data);
+            ->willReturnCallback(static fn (array $data) => $data);
 
         $data = $view->normalize($normalizer);
 

@@ -24,7 +24,7 @@ final class HiddenEntityTypeEndToEndTest extends TestCase
         $metadata->method('getSingleIdentifierFieldName')->willReturn('id');
         $metadata->method('hasField')->willReturn(true);
         $metadata->method('getFieldValue')->willReturnCallback(
-            static fn(object $value, string $field) => $value->{$field}
+            static fn (object $value, string $field) => $value->{$field}
         );
 
         $em = $this->createStub(EntityManagerInterface::class);
@@ -76,22 +76,22 @@ final class InMemoryRepository extends EntityRepository
 
     public function find(mixed $id, LockMode|int|null $lockMode = null, ?int $lockVersion = null): ?object
     {
-        return $this->items[(int)$id] ?? null;
+        return $this->items[(int) $id] ?? null;
     }
 
     public function findAll(): array
     {
-        return array_values($this->items);
+        return \array_values($this->items);
     }
 
-    public function findBy(array $criteria, array|null $orderBy = null, ?int $limit = null, ?int $offset = null): array
+    public function findBy(array $criteria, ?array $orderBy = null, ?int $limit = null, ?int $offset = null): array
     {
         return [];
     }
 
-    public function findOneBy(array $criteria, array|null $orderBy = null): ?object
+    public function findOneBy(array $criteria, ?array $orderBy = null): ?object
     {
-        $id = (int)($criteria['id'] ?? 0);
+        $id = (int) ($criteria['id'] ?? 0);
 
         return $this->items[$id] ?? null;
     }

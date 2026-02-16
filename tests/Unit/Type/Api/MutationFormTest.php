@@ -13,7 +13,7 @@ final class MutationFormTest extends TestCase
 {
     public function testParentAndBlockPrefix(): void
     {
-        $form = new class() extends MutationForm {};
+        $form = new class extends MutationForm {};
 
         self::assertSame('', $form->getBlockPrefix());
         self::assertSame(PostForm::class, $form->getParent());
@@ -21,7 +21,7 @@ final class MutationFormTest extends TestCase
 
     public function testCsrfProtectionIsDisabled(): void
     {
-        $form = new class() extends MutationForm {};
+        $form = new class extends MutationForm {};
         $resolver = new OptionsResolver();
 
         $form->configureOptions($resolver);

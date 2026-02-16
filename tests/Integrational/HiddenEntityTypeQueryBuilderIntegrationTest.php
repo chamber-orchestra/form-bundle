@@ -16,7 +16,7 @@ final class HiddenEntityTypeQueryBuilderIntegrationTest extends TestCase
 {
     public function testQueryBuilderAndChoiceValueAreUsed(): void
     {
-        if (!class_exists(\Doctrine\Bundle\DoctrineBundle\DoctrineBundle::class)) {
+        if (!\class_exists(\Doctrine\Bundle\DoctrineBundle\DoctrineBundle::class)) {
             $this->markTestSkipped('doctrine/doctrine-bundle is required for this integration test.');
         }
 

@@ -11,16 +11,16 @@ declare(strict_types=1);
 
 namespace Tests\Integrational;
 
-use ChamberOrchestra\ViewBundle\ChamberOrchestraViewBundle;
 use ChamberOrchestra\FormBundle\ChamberOrchestraFormBundle;
+use ChamberOrchestra\ViewBundle\ChamberOrchestraViewBundle;
 use Doctrine\Bundle\DoctrineBundle\DoctrineBundle;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\Persistence\ManagerRegistry;
-use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 final class TestKernel extends Kernel

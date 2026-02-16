@@ -17,28 +17,29 @@ class UniqueField extends Constraint
 {
     public const string ALREADY_USED_ERROR = 'a72be866-aae8-4be7-ac1d-fa4f73c167aa';
     public string $message = 'This value has been already used.';
-    public string|null $em = null;
-    public string|null $entityClass = null;
-    /**
-     * @var array OR condition
-     */
+    public ?string $em = null;
+    /** @var class-string|null */
+    public ?string $entityClass = null;
+    /** @var list<string> OR condition */
     public array $fields = [];
     /**
      * @var array<string, mixed>|\Closure AND condition
      */
     public array|\Closure $exclude = [];
-    public string|null $errorPath = null;
+    public ?string $errorPath = null;
     public ?\Closure $normalizer = null;
     public bool $allowEmptyString = false;
     protected const array ERROR_NAMES = [
         self::ALREADY_USED_ERROR => 'ALREADY_USED_ERROR',
     ];
 
+    /** @param array<string, mixed>|null $options */
     public function __construct(?array $options = null)
     {
         parent::__construct($options);
     }
 
+    /** @return list<string> */
     public function getTargets(): array
     {
         return [self::PROPERTY_CONSTRAINT];

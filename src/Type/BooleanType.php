@@ -16,6 +16,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/** @extends AbstractType<bool> */
 class BooleanType extends AbstractType
 {
     public function configureOptions(OptionsResolver $resolver): void
@@ -27,8 +28,13 @@ class BooleanType extends AbstractType
         ]);
     }
 
+    /** @param array<string, mixed> $options */
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $builder->addModelTransformer(new TextToBoolTransformer($options['true_values'], $options['false_values']));
+        /** @var list<mixed> $trueValues */
+        $trueValues = $options['true_values'];
+        /** @var list<mixed> $falseValues */
+        $falseValues = $options['false_values'];
+        $builder->addModelTransformer(new TextToBoolTransformer($trueValues, $falseValues));
     }
 }

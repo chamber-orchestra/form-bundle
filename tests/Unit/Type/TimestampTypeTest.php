@@ -34,7 +34,7 @@ final class TimestampTypeTest extends TestCase
         $builder
             ->expects($this->once())
             ->method('addModelTransformer')
-            ->with($this->callback(static fn($transformer) => $transformer instanceof DateTimeToNumberTransformer));
+            ->with($this->callback(static fn ($transformer) => $transformer instanceof DateTimeToNumberTransformer));
 
         $type->buildForm($builder, ['input' => 'datetime_immutable']);
     }

@@ -23,7 +23,7 @@ final class ProblemNormalizerTest extends TestCase
             ->with('error.key')
             ->willReturn('Translated message');
 
-        $exception = new class() extends \RuntimeException implements TranslatableExceptionInterface {
+        $exception = new class extends \RuntimeException implements TranslatableExceptionInterface {
             public function getTranslatableMessage(): TranslatableInterface
             {
                 return new TranslatableMessage('error.key');
