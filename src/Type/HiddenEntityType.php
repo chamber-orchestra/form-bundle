@@ -43,7 +43,7 @@ class HiddenEntityType extends AbstractType
 
         $builder->addViewTransformer(
             new CallbackTransformer(
-                function (?object $value) use ($entityClass, $choiceValue, $em): string|null {
+                static function (?object $value) use ($entityClass, $choiceValue, $em): string|null {
                     if (null === $value) {
                         return null;
                     }
@@ -99,7 +99,7 @@ class HiddenEntityType extends AbstractType
         $resolver
             ->setRequired('class')
             ->setAllowedTypes('class', 'string')
-            ->setAllowedValues('class', function (string $value) use ($em): bool {
+            ->setAllowedValues('class', static function (string $value) use ($em): bool {
                 if (!\class_exists($value)) {
                     return false;
                 }
@@ -115,7 +115,7 @@ class HiddenEntityType extends AbstractType
 
         $resolver
             ->setAllowedTypes('query_builder', ['null', 'callable', QueryBuilder::class])
-            ->setNormalizer('query_builder', function (Options $options, mixed $value) use ($em): ?QueryBuilder {
+            ->setNormalizer('query_builder', static function (Options $options, mixed $value) use ($em): ?QueryBuilder {
                 if (null === $value || $value instanceof QueryBuilder) {
                     return $value;
                 }
@@ -139,7 +139,7 @@ class HiddenEntityType extends AbstractType
 
         $resolver
             ->setAllowedTypes('choice_value', ['null', 'string'])
-            ->setNormalizer('choice_value', function (Options $options, mixed $value) use ($em): string {
+            ->setNormalizer('choice_value', static function (Options $options, mixed $value) use ($em): string {
                 /** @var class-string $entityClass */
                 $entityClass = $options['class'];
                 $class = $em->getClassMetadata($entityClass);

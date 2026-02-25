@@ -28,15 +28,13 @@ class TelExtension extends AbstractTypeExtension
     {
         $builder->addViewTransformer(
             new CallbackTransformer(
-                function (?string $value): ?string {
-                    return $value;
-                },
-                function (?string $value): ?string {
+                static fn (?string $value): ?string => $value,
+                static function (?string $value): ?string {
                     if (null === $value || '' === $value) {
                         return null;
                     }
 
-                    return \preg_replace('/[^\d]/', '', $value) ?? '';
+                    return \preg_replace('/[^\d+]/', '', $value) ?? '';
                 }
             )
         );

@@ -24,14 +24,8 @@ class TimestampType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'input' => 'datetime_immutable',
             'grouping' => false,
             'scale' => 0,
-        ]);
-
-        $resolver->setAllowedValues('input', [
-            'datetime',
-            'datetime_immutable',
         ]);
     }
 

@@ -26,6 +26,13 @@ final class ArrayToStringTransformerTest extends TestCase
         self::assertSame(['123', '456'], $transformer->reverseTransform('123, 456'));
     }
 
+    public function testReverseTransformTrimsWhitespace(): void
+    {
+        $transformer = new ArrayToStringTransformer();
+
+        self::assertSame(['foo', 'bar', 'baz'], $transformer->reverseTransform('foo, bar, baz'));
+    }
+
     public function testTransformRejectsInvalidType(): void
     {
         $transformer = new ArrayToStringTransformer();

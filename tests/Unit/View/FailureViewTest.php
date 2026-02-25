@@ -41,4 +41,16 @@ final class FailureViewTest extends TestCase
         self::assertSame('Bad', $data['title']);
         self::assertSame('https://datatracker.ietf.org/doc/html/rfc9110#section-15', $data['type']);
     }
+
+    public function testDefaultTitleDerivedFromStatusCode(): void
+    {
+        $normalizer = $this->createMock(NormalizerInterface::class);
+        $normalizer->method('normalize')->willReturnCallback(static fn (array $data) => $data);
+
+        $badRequest = new FailureView(JsonResponse::HTTP_BAD_REQUEST);
+        self::assertSame('Bad Request', $badRequest->normalize($normalizer)['title']);
+
+        $serverError = new FailureView(JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
+        self::assertSame('Internal Server Error', $serverError->normalize($normalizer)['title']);
+    }
 }

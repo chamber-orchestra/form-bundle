@@ -13,6 +13,7 @@ namespace ChamberOrchestra\FormBundle\View;
 
 use ChamberOrchestra\ViewBundle\View\ResponseView;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
 class FailureView extends ResponseView
@@ -20,9 +21,9 @@ class FailureView extends ResponseView
     protected string $type = 'https://datatracker.ietf.org/doc/html/rfc9110#section-15';
     protected readonly string $title;
 
-    public function __construct(int $status = JsonResponse::HTTP_BAD_REQUEST, string $message = 'Validation Failed')
+    public function __construct(int $status = JsonResponse::HTTP_BAD_REQUEST, ?string $message = null)
     {
-        $this->title = $message;
+        $this->title = $message ?? Response::$statusTexts[$status] ?? 'Error';
         parent::__construct($status, ['Content-Type' => 'application/problem+json']);
     }
 
