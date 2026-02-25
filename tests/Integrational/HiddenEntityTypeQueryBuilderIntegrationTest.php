@@ -2,6 +2,13 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the ChamberOrchestra package.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Tests\Integrational;
 
 use ChamberOrchestra\FormBundle\Type\HiddenEntityType;
@@ -40,9 +47,7 @@ final class HiddenEntityTypeQueryBuilderIntegrationTest extends TestCase
             'class' => TestUser::class,
             'choice_value' => 'email',
             'data_class' => null,
-            'query_builder' => static function (EntityRepository $repository) {
-                return $repository->createQueryBuilder('u');
-            },
+            'query_builder' => static fn (EntityRepository $repository) => $repository->createQueryBuilder('u'),
         ]);
 
         $form->submit('user@example.com');

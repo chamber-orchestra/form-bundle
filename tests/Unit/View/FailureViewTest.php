@@ -2,6 +2,13 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the ChamberOrchestra package.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Tests\Unit\View;
 
 use ChamberOrchestra\FormBundle\View\FailureView;
@@ -33,5 +40,17 @@ final class FailureViewTest extends TestCase
 
         self::assertSame('Bad', $data['title']);
         self::assertSame('https://datatracker.ietf.org/doc/html/rfc9110#section-15', $data['type']);
+    }
+
+    public function testDefaultTitleDerivedFromStatusCode(): void
+    {
+        $normalizer = $this->createMock(NormalizerInterface::class);
+        $normalizer->method('normalize')->willReturnCallback(static fn (array $data) => $data);
+
+        $badRequest = new FailureView(JsonResponse::HTTP_BAD_REQUEST);
+        self::assertSame('Bad Request', $badRequest->normalize($normalizer)['title']);
+
+        $serverError = new FailureView(JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
+        self::assertSame('Internal Server Error', $serverError->normalize($normalizer)['title']);
     }
 }

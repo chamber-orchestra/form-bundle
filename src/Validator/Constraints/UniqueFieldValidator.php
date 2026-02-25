@@ -73,7 +73,7 @@ class UniqueFieldValidator extends ConstraintValidator
             && (!\is_object($value) || $value instanceof \DateTimeInterface || \method_exists($value, '__toString'))) {
             $builder->setParameter(
                 '{{ value }}',
-                $this->formatValue($value, self::PRETTY_DATE & self::OBJECT_TO_STRING)
+                $this->formatValue($value, self::PRETTY_DATE | self::OBJECT_TO_STRING)
             );
         }
         $builder

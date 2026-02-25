@@ -2,6 +2,13 @@
 
 declare(strict_types=1);
 
+/*
+ * This file is part of the ChamberOrchestra package.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace Tests\Unit;
 
 use ChamberOrchestra\FormBundle\FormTrait;
@@ -94,7 +101,7 @@ final class FormTraitTest extends TestCase
         $form->method('isValid')->willReturn(true);
         $form->method('getData')->willReturn(['id' => 1]);
 
-        $response = $host->exposeOnFormSubmitted($form, fn () => ['ok' => true]);
+        $response = $host->exposeOnFormSubmitted($form, static fn () => ['ok' => true]);
 
         self::assertInstanceOf(DataView::class, $response);
     }
@@ -195,7 +202,7 @@ final class FormTraitTest extends TestCase
         $stack->push($request);
 
         $container = $this->createStub(ContainerInterface::class);
-        $container->method('get')->willReturnCallback(fn (string $id) => match ($id) {
+        $container->method('get')->willReturnCallback(static fn (string $id) => match ($id) {
             'request_stack' => $stack,
         });
 
@@ -236,7 +243,7 @@ final class FormTraitTest extends TestCase
         $stack->push($request);
 
         $container = $this->createStub(ContainerInterface::class);
-        $container->method('get')->willReturnCallback(fn (string $id) => match ($id) {
+        $container->method('get')->willReturnCallback(static fn (string $id) => match ($id) {
             'request_stack' => $stack,
         });
 
@@ -277,7 +284,7 @@ final class FormTraitTest extends TestCase
         $stack->push($request);
 
         $container = $this->createStub(ContainerInterface::class);
-        $container->method('get')->willReturnCallback(fn (string $id) => match ($id) {
+        $container->method('get')->willReturnCallback(static fn (string $id) => match ($id) {
             'request_stack' => $stack,
         });
 
@@ -322,7 +329,7 @@ final class FormTraitTest extends TestCase
         $stack->push($request);
 
         $container = $this->createStub(ContainerInterface::class);
-        $container->method('get')->willReturnCallback(fn (string $id) => match ($id) {
+        $container->method('get')->willReturnCallback(static fn (string $id) => match ($id) {
             'request_stack' => $stack,
         });
 
@@ -363,7 +370,7 @@ final class FormTraitTest extends TestCase
         $stack = new RequestStack();
 
         $container = $this->createStub(ContainerInterface::class);
-        $container->method('get')->willReturnCallback(function (string $id) use ($stack) {
+        $container->method('get')->willReturnCallback(static function (string $id) use ($stack) {
             return match ($id) {
                 'request_stack' => $stack,
                 'form.factory' => Forms::createFormFactory(),
@@ -398,7 +405,7 @@ final class FormTraitTest extends TestCase
         $stack = new RequestStack();
 
         $container = $this->createStub(ContainerInterface::class);
-        $container->method('get')->willReturnCallback(fn (string $id) => match ($id) {
+        $container->method('get')->willReturnCallback(static fn (string $id) => match ($id) {
             'request_stack' => $stack,
         });
 
