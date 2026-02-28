@@ -38,7 +38,7 @@ readonly class ArrayToStringTransformer implements DataTransformerInterface
         }
 
         return \array_map(
-            static fn (string $value): string => \preg_replace('/[^\d]/', '', $value) ?? '',
+            static fn (string $value): string => \trim($value),
             \explode(',', $value)
         );
     }

@@ -24,7 +24,7 @@ class ValidationFailedView extends FailureView
     /** @param list<ViolationView> $violations */
     public function __construct(array $violations = [], string $message = 'Validation Failed')
     {
-        $this->detail = \implode("\n", \array_map(fn (ViolationView $error): string => $error->title, $violations));
+        $this->detail = \implode("\n", \array_map(static fn (ViolationView $error): string => $error->title, $violations));
         $this->violations = $violations;
 
         parent::__construct(JsonResponse::HTTP_UNPROCESSABLE_ENTITY, $message);

@@ -14,6 +14,7 @@ namespace Tests\Unit\Type;
 use ChamberOrchestra\FormBundle\Transformer\DateTimeToNumberTransformer;
 use ChamberOrchestra\FormBundle\Type\TimestampType;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Clock\DatePoint;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -28,12 +29,11 @@ final class TimestampTypeTest extends TestCase
         $type->configureOptions($resolver);
         $options = $resolver->resolve();
 
-        self::assertSame('datetime_immutable', $options['input']);
         self::assertFalse($options['grouping']);
         self::assertSame(0, $options['scale']);
     }
 
-    public function testBuildFormAddsTransformer(): void
+    public function testBuildFormAddsDatePointTransformer(): void
     {
         $type = new TimestampType();
         $builder = $this->createMock(FormBuilderInterface::class);
@@ -41,9 +41,17 @@ final class TimestampTypeTest extends TestCase
         $builder
             ->expects($this->once())
             ->method('addModelTransformer')
-            ->with($this->callback(static fn ($transformer) => $transformer instanceof DateTimeToNumberTransformer));
+            ->with($this->callback(static function ($transformer): bool {
+                if (!$transformer instanceof DateTimeToNumberTransformer) {
+                    return false;
+                }
 
-        $type->buildForm($builder, ['input' => 'datetime_immutable']);
+                $result = $transformer->reverseTransform(0);
+
+                return $result instanceof DatePoint;
+            }));
+
+        $type->buildForm($builder, []);
     }
 
     public function testParentIsNumberType(): void

@@ -47,9 +47,7 @@ final class HiddenEntityTypeQueryBuilderIntegrationTest extends TestCase
             'class' => TestUser::class,
             'choice_value' => 'email',
             'data_class' => null,
-            'query_builder' => static function (EntityRepository $repository) {
-                return $repository->createQueryBuilder('u');
-            },
+            'query_builder' => static fn (EntityRepository $repository) => $repository->createQueryBuilder('u'),
         ]);
 
         $form->submit('user@example.com');

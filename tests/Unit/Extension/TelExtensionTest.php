@@ -42,6 +42,7 @@ final class TelExtensionTest extends TestCase
         $extension->buildForm($builder, []);
 
         self::assertSame('123', $captured->reverseTransform('1 (2)3'));
+        self::assertSame('+15551234567', $captured->reverseTransform('+1 (555) 123-4567'));
         self::assertNull($captured->reverseTransform(''));
     }
 }

@@ -24,9 +24,9 @@ readonly class JsonStringToArrayTransformer implements DataTransformerInterface
         }
 
         try {
-            $value = \json_encode($value, JSON_THROW_ON_ERROR);
+            $value = \json_encode($value, \JSON_THROW_ON_ERROR);
         } catch (\JsonException $e) {
-            throw new TransformationFailedException(\sprintf('Could not encode array into json.'), $e->getCode(), $e);
+            throw new TransformationFailedException('Could not encode array into json.', $e->getCode(), $e);
         }
 
         return $value;
@@ -41,9 +41,9 @@ readonly class JsonStringToArrayTransformer implements DataTransformerInterface
 
         try {
             /** @var array<mixed> $decoded */
-            $decoded = \json_decode($value, true, 512, JSON_BIGINT_AS_STRING | JSON_THROW_ON_ERROR);
+            $decoded = \json_decode($value, true, 512, \JSON_BIGINT_AS_STRING | \JSON_THROW_ON_ERROR);
         } catch (\JsonException $e) {
-            throw new TransformationFailedException(\sprintf('Could not parse JSON into array.'), $e->getCode(), $e);
+            throw new TransformationFailedException('Could not parse JSON into array.', $e->getCode(), $e);
         }
 
         return $decoded;
