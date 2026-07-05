@@ -38,15 +38,15 @@
   ],
   "require": {
     "php": "^8.5",
-    "chamber-orchestra/view-bundle": "8.0.*",
-    "symfony/dependency-injection": "8.0.*",
-    "symfony/config": "8.0.*",
-    "symfony/framework-bundle": "8.0.*",
-    "symfony/runtime": "8.0.*",
-    "symfony/form": "8.0.*",
-    "symfony/validator": "8.0.*",
-    "symfony/translation": "8.0.*",
-    "symfony/clock": "8.0.*",
+    "chamber-orchestra/view-bundle": "8.1.*",
+    "symfony/dependency-injection": "8.1.*",
+    "symfony/config": "8.1.*",
+    "symfony/framework-bundle": "8.1.*",
+    "symfony/runtime": "8.1.*",
+    "symfony/form": "8.1.*",
+    "symfony/validator": "8.1.*",
+    "symfony/translation": "8.1.*",
+    "symfony/clock": "8.1.*",
     "doctrine/orm": "3.6.*"
   },
   "require-dev": {
@@ -75,7 +75,7 @@
   "extra": {
     "symfony": {
       "allow-contrib": false,
-      "require": "8.0.*"
+      "require": "8.1.*"
     }
   },
   "config": {
