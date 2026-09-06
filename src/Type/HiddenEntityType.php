@@ -43,7 +43,7 @@ class HiddenEntityType extends AbstractType
 
         $builder->addViewTransformer(
             new CallbackTransformer(
-                static function (?object $value) use ($entityClass, $choiceValue, $em): string|null {
+                static function (?object $value) use ($entityClass, $choiceValue, $em): ?string {
                     if (null === $value) {
                         return null;
                     }
@@ -57,7 +57,7 @@ class HiddenEntityType extends AbstractType
 
                     return (string) $id;
                 },
-                function (mixed $id) use ($entityClass, $choiceValue, $queryBuilder, $em): object|null {
+                function (mixed $id) use ($entityClass, $choiceValue, $queryBuilder, $em): ?object {
                     if (!\is_scalar($id)) {
                         throw TransformationFailedException::notAllowedType($id, ['scalar']);
                     }
