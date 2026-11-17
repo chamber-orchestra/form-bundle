@@ -87,5 +87,5 @@ When writing tests, follow the existing pattern: Unit tests under `tests/Unit/` 
 
 ## Dependencies
 
-- Requires Symfony 8.0 components, PHP 8.5, Doctrine ORM 3.6, and chamber-orchestra/view-bundle 8.0
+- Requires Symfony 8.2 components, PHP 8.5, Doctrine ORM 3.6, and chamber-orchestra/view-bundle 8.0
 - Main branch is `8.0` for Symfony 8 compatibility

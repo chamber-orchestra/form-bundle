@@ -38,21 +38,21 @@
   ],
   "require": {
     "php": "^8.5",
-    "chamber-orchestra/view-bundle": "8.1.*",
-    "symfony/dependency-injection": "8.1.*",
-    "symfony/config": "8.1.*",
-    "symfony/framework-bundle": "8.1.*",
-    "symfony/runtime": "8.1.*",
-    "symfony/form": "8.1.*",
-    "symfony/validator": "8.1.*",
-    "symfony/translation": "8.1.*",
-    "symfony/clock": "8.1.*",
-    "doctrine/orm": "3.7.*"
+    "chamber-orchestra/view-bundle": "8.2.*",
+    "symfony/dependency-injection": "8.2.*",
+    "symfony/config": "8.2.*",
+    "symfony/framework-bundle": "8.2.*",
+    "symfony/runtime": "8.2.*",
+    "symfony/form": "8.2.*",
+    "symfony/validator": "8.2.*",
+    "symfony/translation": "8.2.*",
+    "symfony/clock": "8.2.*",
+    "doctrine/orm": "3.8.*"
   },
   "require-dev": {
     "phpunit/phpunit": "^13.3",
     "symfony/test-pack": "^1.2",
-    "doctrine/doctrine-bundle": "3.3.*",
+    "doctrine/doctrine-bundle": "3.4.*",
     "phpstan/phpstan": "^2.2",
     "phpstan/phpstan-symfony": "^2.0.20",
     "phpstan/phpstan-doctrine": "^2.0.28",
@@ -68,14 +68,14 @@
       "Tests\\": "tests/"
     }
   },
-  "minimum-stability": "stable",
+  "minimum-stability": "beta",
   "conflict": {
     "symfony/symfony": "*"
   },
   "extra": {
     "symfony": {
       "allow-contrib": false,
-      "require": "8.1.*"
+      "require": "8.2.*"
     }
   },
   "config": {
@@ -88,5 +88,6 @@
     "analyse": "vendor/bin/phpstan analyse",
     "cs-check": "vendor/bin/php-cs-fixer fix --dry-run --diff",
     "cs-fix": "vendor/bin/php-cs-fixer fix"
-  }
+  },
+  "prefer-stable": true
 }

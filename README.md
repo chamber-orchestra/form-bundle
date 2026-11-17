@@ -27,7 +27,7 @@ A Symfony 8 bundle that simplifies JSON-first form handling for REST APIs. It pr
 ## Requirements
 
 - PHP ^8.5
-- Symfony 8.0 components (framework-bundle, form, validator, config, dependency-injection, runtime, translation, clock)
+- Symfony 8.2 components (framework-bundle, form, validator, config, dependency-injection, runtime, translation, clock)
 - Doctrine ORM 3.6
 - [chamber-orchestra/view-bundle](https://github.com/chamber-orchestra/view-bundle) 8.0
 
